@@ -5,7 +5,7 @@ export default function Card({
   action,
   className,
 }: {
-  title: string;
+  title?: string;
   subtitle?: string;
   children: React.ReactNode;
   action?: React.ReactNode;
@@ -15,13 +15,15 @@ export default function Card({
     <article
       className={`${className} bg-[--primary-color-light] shadow-md rounded-lg p-6`}
     >
-      <section className="flex justify-between items-center w-full pb-6">
-        <span>
-          <h3 className="text-lg font-bold">{title}</h3>
-          <p className="text-sm font-medium text-gray-400">{subtitle}</p>
-        </span>
-        {action && <div>{action}</div>}
-      </section>
+      {title && (
+        <section className="flex justify-between items-center w-full pb-6">
+          <span>
+            <h3 className="text-lg font-bold">{title}</h3>
+            <p className="text-sm font-medium text-gray-400">{subtitle}</p>
+          </span>
+          {action && <div>{action}</div>}
+        </section>
+      )}
       <div className="text-gray-400">{children}</div>
     </article>
   );

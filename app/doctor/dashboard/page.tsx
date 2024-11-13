@@ -70,17 +70,6 @@ export default function DashboardPage() {
     }
   };
 
-  const terminateAppointment = () => {
-    setAppointments((prevAppointments) =>
-      prevAppointments.map((appointment) =>
-        appointment === currentPatient
-          ? { ...appointment, status: false }
-          : appointment
-      )
-    );
-    setCurrentPatient(null);
-  };
-
   return (
     <main>
       <h1 className="text-3xl font-bold">Bienvenido/a {username},</h1>
@@ -170,25 +159,27 @@ export default function DashboardPage() {
             )}
           </Card>
         </section>
-        <section className={` pt-8`}>
-          <TextField
-            name="nueva-nota"
-            label={`Nueva nota para ${currentPatient?.name}`}
-            value={newNote}
-            disabled={isNoteSaved}
-            onChange={(e) => setNewNote(e.target.value)}
-          />
-          <div className="flex gap-x-6 ">
-            <Button
-              className="flex-1"
-              variant="contained"
-              color="secondary"
-              onClick={(e) => handleNewNote(e)}
-            >
-              {isNoteSaved ? "Editar" : "Guardar"}
-            </Button>
-          </div>
-        </section>
+        {currentPatient && (
+          <section className={` pt-8`}>
+            <TextField
+              name="nueva-nota"
+              label={`Nueva nota para ${currentPatient?.name}`}
+              value={newNote}
+              disabled={isNoteSaved}
+              onChange={(e) => setNewNote(e.target.value)}
+            />
+            <div className="flex gap-x-6 ">
+              <Button
+                className="flex-1"
+                variant="contained"
+                color="secondary"
+                onClick={(e) => handleNewNote(e)}
+              >
+                {isNoteSaved ? "Editar" : "Guardar"}
+              </Button>
+            </div>
+          </section>
+        )}
       </article>
     </main>
   );

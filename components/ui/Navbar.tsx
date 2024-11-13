@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Avatar from "./Avatar";
 import {
   DateRangeRounded,
+  FaceRounded,
   GroupsRounded,
   HomeRounded,
   LogoutRounded,
@@ -34,6 +35,19 @@ export default function Navbar({ role }: { role: string }) {
               <HomeRounded />
               Inicio
             </Link>
+            {role === "admin" && (
+              <Link
+                href={`/${role}/doctores`}
+                className={`${
+                  pathname === `/${role}/doctores`
+                    ? "text-[--primary-color] font-bold"
+                    : "text-gray-400 hover:text-gray-500"
+                } flex gap-x-1 text-[--primary-color]`}
+              >
+                <FaceRounded />
+                Doctores
+              </Link>
+            )}
             <Link
               href={`/${role}/citas`}
               className={`${
