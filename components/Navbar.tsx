@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "./Logo";
+import Logo from "./ui/Logo";
 import { usePathname } from "next/navigation";
-import Avatar from "./Avatar";
+import Avatar from "./ui/Avatar";
 import {
   DateRangeRounded,
   FaceRounded,
@@ -11,7 +11,7 @@ import {
   HomeRounded,
   LogoutRounded,
 } from "@mui/icons-material";
-import { username } from "../../app/doctor/layout";
+import { username } from "../app/doctor/layout";
 
 export default function Navbar({ role }: { role: string }) {
   const pathname = usePathname();
@@ -71,7 +71,10 @@ export default function Navbar({ role }: { role: string }) {
               Pacientes
             </Link>
           </section>
-          <section className="flex items-center space-x-14">
+          <Link
+            className="flex items-center space-x-14"
+            href={`/${role}/perfil`}
+          >
             <div className="flex items-center space-x-2">
               <Avatar name={username} />
               <span className="font-medium"> {username} </span>
@@ -80,7 +83,7 @@ export default function Navbar({ role }: { role: string }) {
               <LogoutRounded />
               Cerrar sesión
             </button>
-          </section>
+          </Link>
         </article>
       </div>
     </nav>

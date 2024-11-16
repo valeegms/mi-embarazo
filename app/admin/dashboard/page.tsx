@@ -10,6 +10,7 @@ import {
   FaceRounded,
   GroupRounded,
 } from "@mui/icons-material";
+import DeleteModal from "../../../components/ui/DeleteModal";
 
 // TODO: Replace with real data
 const appointments = [
@@ -40,7 +41,8 @@ const appointments = [
 ];
 
 export default function DashboardPage() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCitaModalOpen, setIsCitaModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [appointment, setAppointment] = useState<
     | {
         name: string;
@@ -55,17 +57,18 @@ export default function DashboardPage() {
 
   const handleNewAppointment = () => {
     setAppointment(undefined);
-    setIsModalOpen(true);
+    setIsCitaModalOpen(true);
   };
 
   const handleEditAppointment = (appointment: (typeof appointments)[0]) => {
     setAppointment(appointment);
-    setIsModalOpen(true);
+    setIsCitaModalOpen(true);
   };
 
   const handleDeleteAppointment = (appointment: (typeof appointments)[0]) => {
     // TODO: Delete appointment
     console.log("Deleting appointment", appointment);
+    setIsDeleteModalOpen(true);
   };
 
   return (
@@ -114,9 +117,17 @@ export default function DashboardPage() {
         onEdit={handleEditAppointment}
         onDelete={handleDeleteAppointment}
       />
+
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Eliminar cita"
+        message="¿Estás seguro que deseas eliminar esta cita? Esta acción no se puede deshacer."
+      />
+
       <CitasModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        isOpen={isCitaModalOpen}
+        onClose={() => setIsCitaModalOpen(false)}
         appointment={appointment}
       />
     </main>

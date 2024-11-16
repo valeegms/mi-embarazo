@@ -1,9 +1,9 @@
 import CitasPage from "../../../components/CitasPage";
 
-export default function DoctorCitasPage() {
+export default function AdminCitasPage() {
   return (
     <>
-      <CitasPage role="doctor" />
+      <CitasPage role="admin" />
     </>
   );
 }

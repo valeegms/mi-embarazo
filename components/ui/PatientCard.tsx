@@ -2,14 +2,27 @@
 
 import { Divider } from "@mui/material";
 import Avatar from "./Avatar";
-import { OpenInNewRounded } from "@mui/icons-material";
+import { DeleteRounded, OpenInNewRounded } from "@mui/icons-material";
+import { useState } from "react";
+import DeleteModal from "./DeleteModal";
 
-export default function PatientCard({ patient }: { patient: any }) {
+export default function PatientCard({
+  patient,
+  role,
+}: {
+  patient: any;
+  role: string;
+}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const handleRowClick = (record: string) => {
-    window.open(`/doctor/pacientes/${record}`, "_blank");
+    window.open(`/${role}/pacientes/${record}`, "_blank");
   };
 
-  console.log("paciente: ", patient);
+  const handleDelete = (record: string) => {
+    // TODO: Implement delete patient
+    console.log("Deleting patient with record: ", record);
+    setIsModalOpen(true);
+  };
 
   return (
     <article className="bg-white shadow-md rounded-lg p-6">
@@ -25,12 +38,28 @@ export default function PatientCard({ patient }: { patient: any }) {
       </section>
       <Divider className="mt-2" />
       <section className="justify-self-end mt-2">
+        {role == "admin" && (
+          <button
+            className="text-red-600 font-bold hover:text-red-800"
+            onClick={() => handleDelete(patient.record)}
+          >
+            <DeleteRounded />
+          </button>
+        )}
         <button
           className="text-[--primary-color] font-bold hover:text-[--primary-color-dark]"
           onClick={() => handleRowClick(patient.record)}
         >
           <OpenInNewRounded />
         </button>
+
+        <DeleteModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title="Eliminar paciente"
+          message="¿Estás seguro que deseas eliminar este paciente? Esta acción no se
+            puede deshacer."
+        />
       </section>
     </article>
   );
