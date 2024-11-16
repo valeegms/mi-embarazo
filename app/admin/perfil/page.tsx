@@ -1,3 +1,9 @@
+import ProfilePage from "../../../components/ProfilePage";
+
 export default function AdminPerfilPage() {
-  return <main></main>;
+  return (
+    <>
+      <ProfilePage role="admin" />
+    </>
+  );
 }

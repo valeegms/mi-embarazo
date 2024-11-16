@@ -16,8 +16,6 @@ import { username } from "../app/doctor/layout";
 export default function Navbar({ role }: { role: string }) {
   const pathname = usePathname();
 
-  console.log(pathname);
-
   return (
     <nav className="bg-white shadow-lg">
       <div className="container mx-auto px-4">
