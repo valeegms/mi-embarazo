@@ -146,13 +146,13 @@ export default function ProfilePage({ role }: { role: string }) {
               onClick={saveChanges}
               className="flex-1 bg-[--primary-color] text-white rounded-md p-2 w-full transition"
             >
-              Save Changes
+              Guardar
             </button>
             <button
               onClick={() => setIsEditing(false)}
               className="flex-1 bg-red-100 text-red-700 rounded-md p-2 w-full hover:bg-red-200 transition"
             >
-              Cancel
+              Cancelar
             </button>
           </>
         ) : (
@@ -160,7 +160,7 @@ export default function ProfilePage({ role }: { role: string }) {
             onClick={() => setIsEditing(true)}
             className="flex-1 bg-[--primary-color] text-white rounded-md p-2 w-full transition"
           >
-            Edit Profile
+            Editar
           </button>
         )}
       </footer>
