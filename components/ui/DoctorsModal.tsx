@@ -10,6 +10,7 @@ type Doctor = {
   gender: string;
   office: string;
   license: string;
+  password?: string;
 };
 
 export default function DoctorsModal({
@@ -63,7 +64,7 @@ export default function DoctorsModal({
 
   return (
     <Modal open={isOpen} onClose={onClose}>
-      <div className="bg-white p-8 w-1/2 mx-auto mt-20 rounded-md">
+      <div className="bg-white p-8 w-8/12 mx-auto mt-20 rounded-md">
         <h2 className="text-2xl font-bold">
           {doctor ? "Editar doctor" : "Nuevo doctor"}
         </h2>
@@ -75,27 +76,69 @@ export default function DoctorsModal({
             value={formData.name}
             onChange={handleChange}
           />
+          <div className="flex space-x-2">
+            <Input
+              label="Especialidad"
+              name="speciality"
+              type="text"
+              className="flex-1"
+              value={formData.speciality}
+              onChange={handleChange}
+            />
+            <Input
+              label="Cédula Profesional"
+              name="license"
+              type="text"
+              className="flex-1"
+              value={formData.license}
+              onChange={handleChange}
+            />
+          </div>
+          <div className="flex space-x-2">
+            <Input
+              label="Correo"
+              name="email"
+              type="email"
+              className="flex-1"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <Input
+              label="Teléfono"
+              name="phone"
+              type="tel"
+              className="flex-1"
+              value={formData.phone}
+              onChange={handleChange}
+            />
+          </div>
           <Input
-            label="Especialidad"
-            name="speciality"
-            type="text"
-            value={formData.speciality}
+            label="Contraseña"
+            name="password"
+            type="password"
+            value={formData.password}
             onChange={handleChange}
           />
-          <Input
-            label="Correo"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-          />
-          <Input
-            label="Teléfono"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-          />
+          {doctor && (
+            <div className="flex space-x-2">
+              <Input
+                label="Nueva Contraseña"
+                name="newPassword"
+                type="password"
+                className="flex-1"
+                value={formData.password}
+                onChange={handleChange}
+              />
+              <Input
+                label="Confirmar Contraseña"
+                name="confirmPassword"
+                type="password"
+                className="flex-1"
+                value={formData.password}
+                onChange={handleChange}
+              />
+            </div>
+          )}
           <div className="flex space-x-2">
             <div className="space-y-1 flex-1">
               <label
@@ -124,13 +167,7 @@ export default function DoctorsModal({
               onChange={handleChange}
             />
           </div>
-          <Input
-            label="Cédula Profesional"
-            name="license"
-            type="text"
-            value={formData.license}
-            onChange={handleChange}
-          />
+
           <section className="flex space-x-2">
             <button
               type="submit"
