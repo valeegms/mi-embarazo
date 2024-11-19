@@ -6,25 +6,46 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const router = useRouter();
+  const router = useRouter()
+  const [error, setError] = useState("")
+ 
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+ 
+    const formData = new FormData(event.currentTarget)
+    const email = formData.get('email')
+    const password = formData.get('password')
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    })
+ 
+    
+    if (response.ok) {
+      const data = await response.json();
 
-    // Mock login check (for now, you can just assume it's successful)
-    if (email && password) {
-      // Set a flag in localStorage to simulate a "logged-in" user
+      // Assume the API returns a user object with a `role` property
+      const { role } = data;
+
+      // Save login state and redirect based on user role
       localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userRole", role); // Optional, for future checks
 
-      // Redirect to the dashboard
-      router.push("/doctor/dashboard");
+      if (role === "profesor") {
+        router.push("/profesor/dashboard");
+      } else if (role === "admin") {
+        router.push("/admin/dashboard");
+      } else {
+        setError("Unexpected role. Contact support.");
+      }
+
     } else {
       setError("Invalid credentials");
     }
-  };
+  }
+
 
   return (
     <main className="h-screen">
@@ -47,30 +68,22 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="pt-4">
               <section className="space-y-8">
                 <div className="space-y-1">
+
                   <label className="font-medium" htmlFor="email">
                     Correo electrónico
                   </label>
                   <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="ejemplo@ejemplo.com"
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
+                    type="email" name="email" placeholder="ejemplo@ejemplo.com" required
                     className="p-2 border border-gray-200 rounded-md w-full"
                   />
                 </div>
+
                 <div className="space-y-1">
                   <label className="font-medium" htmlFor="password">
                     Contraseña
                   </label>
                   <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="*******"
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
+                    type="password" name="password" placeholder="********"
                     className="p-2 border border-gray-200 rounded-md w-full"
                   />
                 </div>
@@ -82,12 +95,7 @@ export default function LoginPage() {
                   ¿Olvidaste tu contraseña?
                 </button>
 
-                <button
-                  type="submit"
-                  className="bg-[--primary-color] text-white rounded-md p-2 w-full"
-                >
-                  Ingresar
-                </button>
+                <button type="submit" className="bg-[--primary-color] text-white rounded-md p-2 w-full">Ingresar</button>
               </section>
             </form>
             {error && (
