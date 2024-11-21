@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Logo from "./Logo";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Avatar from "./Avatar";
 import {
   DateRangeRounded,
@@ -15,8 +15,13 @@ import { username } from "../../app/doctor/layout";
 
 export default function Navbar({ role }: { role: string }) {
   const pathname = usePathname();
+  const router = useRouter();
 
-  console.log(pathname);
+  // Para el cierre de sesión :)
+  const handleLogout = () => {
+    localStorage.removeItem("accessToken"); // 
+    router.push("/login"); 
+  };
 
   return (
     <nav className="bg-white shadow-lg">
@@ -42,7 +47,7 @@ export default function Navbar({ role }: { role: string }) {
                   pathname === `/${role}/doctores`
                     ? "text-[--primary-color] font-bold"
                     : "text-gray-400 hover:text-gray-500"
-                } flex gap-x-1 text-[--primary-color]`}
+                } flex gap-x-1`}
               >
                 <FaceRounded />
                 Doctores
@@ -54,7 +59,7 @@ export default function Navbar({ role }: { role: string }) {
                 pathname === `/${role}/citas`
                   ? "text-[--primary-color] font-bold"
                   : "text-gray-400 hover:text-gray-500"
-              } flex gap-x-1 text-[--primary-color]`}
+              } flex gap-x-1`}
             >
               <DateRangeRounded />
               Citas
@@ -65,7 +70,7 @@ export default function Navbar({ role }: { role: string }) {
                 pathname === `/${role}/pacientes`
                   ? "text-[--primary-color] font-bold"
                   : "text-gray-400 hover:text-gray-500"
-              } flex gap-x-1 text-[--primary-color]`}
+              } flex gap-x-1`}
             >
               <GroupsRounded />
               Pacientes
@@ -76,7 +81,10 @@ export default function Navbar({ role }: { role: string }) {
               <Avatar name={username} />
               <span className="font-medium"> {username} </span>
             </div>
-            <button className="flex font-bold text-[--primary-color] hover:text-[--primary-color-dark]">
+            <button
+              onClick={handleLogout}
+              className="flex font-bold text-[--primary-color] hover:text-[--primary-color-dark]"
+            >
               <LogoutRounded />
               Cerrar sesión
             </button>

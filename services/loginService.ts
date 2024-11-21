@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://backend-url/api";
+const API_BASE_URL = "http://localhost:8000";
 
 export interface LoginResponse {
   access_token: string;
@@ -15,7 +15,7 @@ export interface LoginError {
 
 export async function loginService(email: string, password: string): Promise<LoginResponse> {
   try {
-    // Realizar la solicitud al backend con el email y password
+    //solicitud al backend con el email y password
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: "POST",
       headers: {
@@ -27,17 +27,17 @@ export async function loginService(email: string, password: string): Promise<Log
       }),
     });
 
-    // Validar si la respuesta fue exitosa
+    //se valida si la respuesta fue exitosa
     if (!response.ok) {
       const error: LoginError = await response.json();
       throw new Error(error.detail || "Login failed");
     }
 
-    // Retornar los datos exitosos
+    //reetorna los datos exitosos
     const data: LoginResponse = await response.json();
     return data;
   } catch (error) {
     console.error("Error en loginService:", error);
-    throw error; // Lanzar el error para manejarlo en LoginPage
+    throw error; // Lanza el error para manejarlo en LoginPage
   }
 }
