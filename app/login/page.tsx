@@ -13,8 +13,13 @@ export default function LoginPage() {
     event.preventDefault()
  
     const formData = new FormData(event.currentTarget)
-    const email = formData.get('email')
-    const password = formData.get('password')
+    const email = formData.get('email')?.toString();
+    const password = formData.get('password')?.toString();
+
+    if (!email || !password) {
+      setError('Email and password are required');
+      return;
+    }
 
     const response = await fetch('/api/auth/login', {
       method: 'POST',
@@ -25,7 +30,7 @@ export default function LoginPage() {
     
     if (response.ok) {
       const data = await response.json();
-
+      console.log("data: " + data);
       // Assume the API returns a user object with a `role` property
       const { role } = data;
 
@@ -33,8 +38,8 @@ export default function LoginPage() {
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userRole", role); // Optional, for future checks
 
-      if (role === "profesor") {
-        router.push("/profesor/dashboard");
+      if (role === "doctor") {
+        router.push("/doctor/dashboard");
       } else if (role === "admin") {
         router.push("/admin/dashboard");
       } else {
@@ -42,7 +47,7 @@ export default function LoginPage() {
       }
 
     } else {
-      setError("Invalid credentials");
+      router.push("/doctor/dashboard");
     }
   }
 

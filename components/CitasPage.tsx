@@ -1,43 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AppointmentsTable from "./ui/AppointmentsTable";
 import CitasModal from "./ui/CitasModal";
 import Input from "./ui/Input";
 import DeleteModal from "./ui/DeleteModal";
 
-// TODO: Replace with real data
-const appointments = [
-  {
-    name: "Chapell Roan",
-    record: "EXP-2345",
-    date: "22 de octubre",
-    time: "14:30",
-    type: "Nuevo paciente",
-    status: "Confirmada",
-  },
-  {
-    name: "Shanik Berman",
-    record: "EXP-6789",
-    date: "22 de octubre",
-    time: "17:30",
-    type: "Seguimiento",
-    status: "Confirmada",
-  },
-  {
-    name: "Shanik Berman",
-    record: "EXP-6789",
-    date: "22 de octubre",
-    time: "19:00",
-    type: "Seguimiento",
-    status: "Cancelada",
-  },
-];
+const LOCAL_STORAGE_KEY = "appointments";
 
-export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
+export default function CitasPage({  }: { role: "doctor" | "admin" }) {
   const [isCitasModalOpen, setIsCitasModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [appointment, setAppointment] = useState<
+  const [selectedAppointment, setSelectedAppointment] = useState<
     | {
         name: string;
         record: string;
@@ -49,19 +23,62 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
     | undefined
   >(undefined);
 
+  const [appointments, setAppointments] = useState<
+    {
+      name: string;
+      record: string;
+      date: string;
+      time: string;
+      type: string;
+      status: string;
+    }[]
+  >([]);
+
+  // Load appointments from localStorage when the component mounts
+  useEffect(() => {
+    const storedAppointments = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedAppointments) {
+      setAppointments(JSON.parse(storedAppointments));
+    }
+  }, []);
+
+  // Save appointments to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appointments));
+  }, [appointments]);
+
   const handleNewAppointment = () => {
-    setAppointment(undefined);
+    setSelectedAppointment(undefined);
     setIsCitasModalOpen(true);
   };
 
-  const handleEditAppointment = (appointment: (typeof appointments)[0]) => {
-    setAppointment(appointment);
+  const handleEditAppointment = (appointment: typeof appointments[0]) => {
+    setSelectedAppointment(appointment);
     setIsCitasModalOpen(true);
   };
 
-  const handleDeleteAppointment = (appointment: (typeof appointments)[0]) => {
-    // TODO: Delete appointment
+  const handleDeleteAppointment = (appointment: typeof appointments[0]) => {
+    setAppointments((prev) =>
+      prev.filter((appt) => appt.record !== appointment.record)
+    );
     setIsDeleteModalOpen(true);
+  };
+
+  const handleSaveAppointment = (editedAppointment: typeof appointments[0]) => {
+    setAppointments((prev) => {
+      const index = prev.findIndex(
+        (appt) => appt.record === editedAppointment.record
+      );
+      if (index !== -1) {
+        // Update existing appointment
+        const updated = [...prev];
+        updated[index] = editedAppointment;
+        return updated;
+      }
+      // Add new appointment
+      return [...prev, editedAppointment];
+    });
+    setIsCitasModalOpen(false);
   };
 
   return (
@@ -93,7 +110,8 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
       <CitasModal
         isOpen={isCitasModalOpen}
         onClose={() => setIsCitasModalOpen(false)}
-        appointment={appointment}
+        appointment={selectedAppointment}
+        onSave={handleSaveAppointment}
       />
     </main>
   );

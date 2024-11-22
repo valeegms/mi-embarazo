@@ -1,21 +1,23 @@
 import bcrypt from 'bcrypt';
-import prisma from '../db';
+import prisma from '@/lib/db';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 export default async function handler(req: NextApiRequest,
     res: NextApiResponse) {
   const { email, password } = req.body;
 
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and password are required.' });
+  }
 
   try {
     // Fetch user by email
 
-    const ss = 'SELECT * FROM miembarazoapi.user';
-    console.log(ss);
-
     const user = await prisma.user.findUnique({
       where: { email },
     });
+
+    console.log('User found:', user);
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });

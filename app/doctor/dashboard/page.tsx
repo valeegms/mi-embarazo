@@ -114,11 +114,7 @@ export default function DashboardPage() {
                       aria-label="Ver expediente"
                       size="small"
                       style={{ color: "var(--primary-color)" }}
-                      onClick={() =>
-                        window.open(
-                          `/doctor/pacientes/${currentPatient?.record}`,
-                          "_blank"
-                        )
+                      onClick={() => window.open(`/doctor/pacientes/${currentPatient?.record}`,"_blank") //aqui te lleva al expediente
                       }
                     >
                       <OpenInNewRounded fontSize="inherit" />

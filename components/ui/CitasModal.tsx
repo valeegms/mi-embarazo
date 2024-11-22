@@ -6,6 +6,7 @@ export default function CitasModal({
   isOpen,
   onClose,
   appointment,
+  onSave,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -17,6 +18,14 @@ export default function CitasModal({
     type: string;
     status: string;
   };
+  onSave: (updatedAppointment: {
+    name: string;
+    record: string;
+    date: string;
+    time: string;
+    type: string;
+    status: string;
+  }) => void; // Callback to save the appointment
 }) {
   const [formData, setFormData] = useState({
     name: "",
@@ -52,8 +61,8 @@ export default function CitasModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted Data: ", formData);
-    onClose();
+    onSave(formData); // Notify parent about the changes
+    onClose(); // Close the modal
   };
 
   return (
@@ -71,10 +80,10 @@ export default function CitasModal({
           </label>
           <select
             id="paciente"
-            name="paciente"
+            name="name"
             className="p-2 border border-gray-200 rounded-md w-full"
             onChange={handleChange}
-            value={appointment?.name}
+            value={formData.name}
             disabled={appointment !== undefined}
           >
             {appointment ? (
@@ -93,7 +102,7 @@ export default function CitasModal({
             type="text"
             value={formData.record}
             onChange={handleChange}
-            disabled
+            disabled={appointment !== undefined}
           />
           <div className="flex space-x-2">
             <Input
@@ -159,6 +168,7 @@ export default function CitasModal({
               Guardar
             </button>
             <button
+              type="button"
               onClick={onClose}
               className="bg-red-100 text-red-700 rounded-md p-2 w-full hover:bg-red-200"
             >
