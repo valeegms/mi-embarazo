@@ -1,51 +1,29 @@
 import { Modal } from "@mui/material";
 import Input from "./Input";
 import { useEffect, useState } from "react";
-
-type Doctor = {
-  name: string;
-  speciality: string;
-  email: string;
-  phone: string;
-  gender: string;
-  office: string;
-  license: string;
-  password?: string;
-};
+import { DoctorModel } from "@/models/DoctorModel";
 
 export default function DoctorsModal({
   isOpen,
   onClose,
   doctor,
+  onSave,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  doctor?: Doctor;
+  doctor?: DoctorModel;
+  onSave?: (doctor: DoctorModel) => void;
 }) {
-  const [formData, setFormData] = useState<Doctor>({
-    name: "",
-    speciality: "",
-    email: "",
-    phone: "",
-    gender: "Masculino",
-    office: "",
-    license: "",
-  });
+  const [formData, setFormData] = useState<DoctorModel>(
+    new DoctorModel("", "", "", "", "", "", "", "")
+  );
 
   useEffect(() => {
     if (doctor) {
       setFormData(doctor);
     } else {
       // Reset form for new doctor records
-      setFormData({
-        name: "",
-        speciality: "",
-        email: "",
-        phone: "",
-        gender: "Masculino",
-        office: "",
-        license: "",
-      });
+      setFormData(new DoctorModel("", "", "", "", "", "", "", ""));
     }
   }, [doctor]);
 
@@ -172,6 +150,7 @@ export default function DoctorsModal({
             <button
               type="submit"
               className="bg-[--primary-color] text-white rounded-md p-2 w-full"
+              onClick={() => onSave && onSave(formData)}
             >
               Guardar
             </button>

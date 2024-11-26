@@ -1,13 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "./ui/Avatar";
 import { username } from "../app/doctor/layout";
 import Input from "./ui/Input";
+import { fetchProfile } from "@/services/perfilService";
+import { fetchDoctors } from "@/services/doctor";
 
 export default function ProfilePage({ role }: { role: string }) {
   const [isEditing, setIsEditing] = useState(false); // Toggle between view and edit modes
-
   // Dummy user data (replace this with real data later)
   const [userData, setUserData] = useState({
     userName: username,
@@ -16,6 +17,14 @@ export default function ProfilePage({ role }: { role: string }) {
     userPhone: "123-456-7890",
     userPassword: "password",
   });
+
+  useEffect(() => {
+    // Fetch user data from the API
+    console.log("Fetching user data...");
+    fetchProfile("", role).then((data) => {
+      console.log("Doctors: ", data);
+    });
+  }, []);
 
   // Handle input changes in edit mode
   const handleInputChange = (e) => {

@@ -1,56 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DoctorsTable from "../../../components/ui/DoctorsTable";
 import DoctorsModal from "../../../components/ui/DoctorsModal";
 import Input from "../../../components/ui/Input";
 import DeleteModal from "../../../components/ui/DeleteModal";
-
-const doctors = [
-  {
-    name: "Dr. Juan Perez",
-    speciality: "Pediatra",
-    email: "juanp@doctor.com",
-    phone: "1234567890",
-    gender: "Masculino",
-    office: "A-123",
-    license: "123456",
-  },
-  {
-    name: "Dra. Maria Lopez",
-    speciality: "Ginecologa",
-    email: "marial@doctor.com",
-    phone: "0987654321",
-    gender: "Femenino",
-    office: "B-456",
-    license: "654321",
-  },
-  {
-    name: "Dr. Carlos Ramirez",
-    speciality: "Cardiologo",
-    email: "carlosr@doctor.com",
-    phone: "1230984567",
-    gender: "Masculino",
-    office: "C-789",
-    license: "456789",
-  },
-];
+import { DoctorModel } from "@/models/DoctorModel";
+import { addDoctor, fetchDoctors, updateDoctor } from "@/services/doctor";
 
 export default function DoctoresPage() {
+  const [doctors, setDoctors] = useState<DoctorModel[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isDoctorsModalOpen, setIsDoctorsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [doctor, setDoctor] = useState<
-    | {
-        name: string;
-        speciality: string;
-        email: string;
-        phone: string;
-        gender: string;
-        office: string;
-        license: string;
+  const [doctor, setDoctor] = useState<DoctorModel | undefined>(undefined);
+
+  useEffect(() => {
+    const loadDoctors = async () => {
+      try {
+        const data = (await fetchDoctors()) as DoctorModel[];
+        setDoctors(data);
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      } finally {
+        setLoading(false);
       }
-    | undefined
-  >(undefined);
+    };
+
+    loadDoctors();
+  }, []);
 
   const handleNewDoctor = () => {
     setDoctor(undefined);
@@ -60,6 +38,33 @@ export default function DoctoresPage() {
   const handleEditDoctor = (doctor: (typeof doctors)[0]) => {
     setDoctor(doctor);
     setIsDoctorsModalOpen(true);
+  };
+
+  const handleSaveDoctor = async (newDoctor: DoctorModel) => {
+    try {
+      if (newDoctor.id) {
+        // Update existing doctor
+        const updatedDoctor = (await updateDoctor(
+          newDoctor.id,
+          newDoctor
+        )) as DoctorModel;
+        setDoctors((prevDoctors) =>
+          prevDoctors.map((doctor) =>
+            doctor.id === newDoctor.id ? updatedDoctor : doctor
+          )
+        );
+      } else {
+        // Add new doctor
+        const createdDoctor = (await addDoctor(newDoctor)) as DoctorModel;
+        setDoctors((prevDoctors) => [...prevDoctors, createdDoctor]);
+      }
+      alert("Doctor guardado exitosamente");
+    } catch (error) {
+      console.error("Error saving doctor:", error);
+      alert("Error guardando el doctor.");
+    } finally {
+      setIsDoctorsModalOpen(false);
+    }
   };
 
   const handleDeleteDoctor = (doctor: (typeof doctors)[0]) => {
@@ -79,6 +84,7 @@ export default function DoctoresPage() {
         </button>
       </section>
       <Input name="search" placeholder="Buscar cita" type="search" />
+      {loading && <p>Cargando doctores...</p>}
       <DoctorsTable
         doctors={doctors}
         onEditDoctor={handleEditDoctor}
@@ -96,6 +102,7 @@ export default function DoctoresPage() {
         isOpen={isDoctorsModalOpen}
         onClose={() => setIsDoctorsModalOpen(false)}
         doctor={doctor}
+        onSave={handleSaveDoctor}
       />
     </main>
   );

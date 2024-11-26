@@ -8,21 +8,12 @@ import {
   TableRow,
 } from "@mui/material";
 import { DeleteRounded, Edit } from "@mui/icons-material";
-
-type Doctor = {
-  name: string;
-  speciality: string;
-  email: string;
-  phone: string;
-  gender: string;
-  office: string;
-  license: string;
-};
+import { DoctorModel } from "@/models/DoctorModel";
 
 type DoctorsTableProps = {
-  doctors: Doctor[];
-  onEditDoctor: (doctor: Doctor) => void;
-  onDeleteDoctor: (doctor: Doctor) => void;
+  doctors: DoctorModel[];
+  onEditDoctor: (doctor: DoctorModel) => void;
+  onDeleteDoctor: (doctor: DoctorModel) => void;
 };
 
 export default function DoctorsTable({

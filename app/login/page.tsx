@@ -4,6 +4,7 @@ import Image from "next/image";
 import Logo from "../../components/ui/Logo";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { loginService } from "../../src/services/loginService";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,19 +12,55 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  // Expresión regular para validar formato del correo
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Mock login check (for now, you can just assume it's successful)
-    if (email && password) {
-      // Set a flag in localStorage to simulate a "logged-in" user
-      localStorage.setItem("isLoggedIn", "true");
+    // Validación 1: Verificar si el correo está vacío
+    if (!email) {
+      setError("Por favor, ingresa tu correo.");
+      return;
+    }
 
-      // Redirect to the dashboard
+    // Validación 2: Validar el formato del correo
+    if (!emailRegex.test(email)) {
+      setError("Por favor, ingresa un correo válido.");
+      return;
+    }
+
+    // Validación 3: Verificar si la contraseña cumple con la longitud mínima
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+
+    // Nueva lógica: Llamar al servicio de login
+    try {
+      const response = await loginService(email, password);
+
+      // Guardar el token y redirigir al dashboard
+      localStorage.setItem("accessToken", response.access_token);
+      router.push("/doctor/dashboard");
+    } catch (error: unknown) {
+      // Manejo de error
+      if (error instanceof Error) {
+        setError(error.message || "Ocurrió un error al iniciar sesión.");
+      } else {
+        setError("Ocurrió un error inesperado.");
+      }
+    }
+
+    /* SIMULACIÓN ANTERIOR DE LOGIN
+    if (email && password) {
+      // Simulación de inicio de sesión
+      localStorage.setItem("isLoggedIn", "true");
       router.push("/doctor/dashboard");
     } else {
       setError("Invalid credentials");
     }
+    */
   };
 
   return (
@@ -42,10 +79,12 @@ export default function LoginPage() {
           <div className="px-14 flex-1 pt-40">
             <h1 className="text-3xl font-bold">¡Bienvenido/a de nuevo!</h1>
             <p className="text-gray-400 font-light pt-1">
-              Ingresa a tus credenciales para poder acceder al sitio.
+              Ingresa tus credenciales para poder acceder al sitio.
             </p>
-            <form onSubmit={handleSubmit} className="pt-4">
+            {/* Formulario con noValidate */}
+            <form onSubmit={handleSubmit} noValidate className="pt-4">
               <section className="space-y-8">
+                {/* Input de correo */}
                 <div className="space-y-1">
                   <label className="font-medium" htmlFor="email">
                     Correo electrónico
@@ -60,6 +99,8 @@ export default function LoginPage() {
                     className="p-2 border border-gray-200 rounded-md w-full"
                   />
                 </div>
+
+                {/* Input de contraseña */}
                 <div className="space-y-1">
                   <label className="font-medium" htmlFor="password">
                     Contraseña
@@ -74,14 +115,8 @@ export default function LoginPage() {
                     className="p-2 border border-gray-200 rounded-md w-full"
                   />
                 </div>
-                <button
-                  onClick={() => router.push("/forgot-password")}
-                  className="text-[--primary-color] text-sm font-medium block place-self-end underline hover:text-[--primary-color-dark]"
-                  style={{ marginTop: "1rem" }}
-                >
-                  ¿Olvidaste tu contraseña?
-                </button>
 
+                {/* Botón para enviar */}
                 <button
                   type="submit"
                   className="bg-[--primary-color] text-white rounded-md p-2 w-full"
@@ -90,6 +125,8 @@ export default function LoginPage() {
                 </button>
               </section>
             </form>
+
+            {/* Mostrar mensaje de error */}
             {error && (
               <div className="text-red-500 mt-4">
                 <p>{error}</p>
