@@ -10,6 +10,7 @@ import { Button, IconButton, Tooltip } from "@mui/material";
 
 import Input from "../../../components/ui/Input";
 import TextField from "../../../components/ui/TextField";
+import { redirect } from "next/navigation";
 
 const currentDate = new Date().toLocaleDateString("es-ES", {
   year: "numeric",
@@ -42,6 +43,13 @@ export default function DashboardPage() {
   const [newNote, setNewNote] = useState("");
   const [isNoteSaved, setIsNoteSaved] = useState(false);
 
+  const isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated') || 'false');
+  
+  if (!isAuthenticated) {
+    // Redirect to login if the user is not authenticated
+    redirect("/login");
+  }
+  
   appointments.sort((a, b) => (a.time > b.time ? 1 : -1));
 
   const [currentPatient, setCurrentPatient] = useState<null | {

@@ -35,9 +35,12 @@ export async function loginService(email: string, password: string): Promise<Log
 
     //reetorna los datos exitosos
     const data: LoginResponse = await response.json();
+    console.log(data);
     return data;
   } catch (error) {
     console.error("Error en loginService:", error);
+    
+    console.log(JSON.parse(localStorage.getItem('isAuthenticated') || 'false'));
     throw error; // Lanza el error para manejarlo en LoginPage
   }
 }

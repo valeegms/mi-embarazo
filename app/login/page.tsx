@@ -12,6 +12,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
+  
+
   // Expresión regular para validar formato del correo
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -42,13 +44,23 @@ export default function LoginPage() {
 
       // Guardar el token y redirigir al dashboard
       localStorage.setItem("accessToken", response.access_token);
+      
+      localStorage.setItem('isAuthenticated', JSON.stringify(true));
+
+      // Retrieve and convert back to boolean
+      const su = JSON.parse(localStorage.getItem('isAuthenticated') || 'false');
+      console.log(su); // true
+
+
       router.push("/doctor/dashboard");
     } catch (error: unknown) {
       // Manejo de error
       if (error instanceof Error) {
+        localStorage.setItem('isAuthenticated', JSON.stringify(false));
         setError(error.message || "Ocurrió un error al iniciar sesión.");
       } else {
         setError("Ocurrió un error inesperado.");
+        localStorage.setItem('isAuthenticated', JSON.stringify(false));
       }
     }
 

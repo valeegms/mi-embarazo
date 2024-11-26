@@ -10,6 +10,7 @@ import {
   FaceRounded,
   GroupRounded,
 } from "@mui/icons-material";
+import { redirect } from "next/navigation";
 
 // TODO: Replace with real data
 const appointments = [
@@ -38,6 +39,13 @@ const appointments = [
     status: "Cancelada",
   },
 ];
+
+const isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated') || 'false');
+  
+  if (!isAuthenticated) {
+    // Redirect to login if the user is not authenticated
+    redirect("/login");
+  }
 
 export default function DashboardPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);

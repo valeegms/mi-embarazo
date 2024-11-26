@@ -16,7 +16,8 @@
     "luxon": "^3.5.0",
     "next": "14.2.15",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-router-dom": "^7.0.1"
   },
   "devDependencies": {
     "@types/luxon": "^3.4.2",

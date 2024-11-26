@@ -4,6 +4,8 @@ import { useState } from "react";
 import AppointmentsTable from "../../../components/ui/AppointmentsTable";
 import CitasModal from "../../../components/ui/CitasModal";
 import Input from "../../../components/ui/Input";
+import { redirect } from "next/navigation";
+
 
 // TODO: Replace with real data
 const appointments = [
@@ -47,6 +49,13 @@ export default function CitasPage() {
     | undefined
   >(undefined);
 
+  const isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated') || 'false');
+  
+  if (!isAuthenticated) {
+    // Redirect to login if the user is not authenticated
+    redirect("/login");
+  }
+  
   const handleNewAppointment = () => {
     setAppointment(undefined);
     setIsModalOpen(true);
