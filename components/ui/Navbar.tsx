@@ -20,6 +20,7 @@ export default function Navbar({ role }: { role: string }) {
   // Para el cierre de sesión :)
   const handleLogout = () => {
     localStorage.removeItem("accessToken"); // 
+    localStorage.setItem('isAuthenticated', JSON.stringify(false));
     router.push("/login"); 
   };
 
