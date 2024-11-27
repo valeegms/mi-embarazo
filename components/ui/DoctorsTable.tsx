@@ -54,7 +54,7 @@ export default function DoctorsTable({
           {doctors.map((doctor, index) => (
             <TableRow key={index}>
               <TableCell>{doctor.name}</TableCell>
-              <TableCell>{doctor.speciality}</TableCell>
+              <TableCell>{doctor.specialization}</TableCell>
               <TableCell>{doctor.email}</TableCell>
               <TableCell>{doctor.phone}</TableCell>
               <TableCell>{doctor.gender}</TableCell>

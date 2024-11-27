@@ -3,23 +3,33 @@
 import { useEffect, useState } from "react";
 import DoctorsTable from "../../../components/ui/DoctorsTable";
 import DoctorsModal from "../../../components/ui/DoctorsModal";
+import DeleteModalDoctor from "../../../components/ui/DeleteModalDoctor";
 import Input from "../../../components/ui/Input";
-import DeleteModal from "../../../components/ui/DeleteModal";
-import { DoctorModel } from "@/models/DoctorModel";
-import { addDoctor, fetchDoctors, updateDoctor } from "@/services/doctor";
+import {
+  fetchDoctors,
+  addDoctor,
+  updateDoctor,
+  deleteDoctor,
+} from "@/services/adminDoctoresService";
+import { DoctorModel } from "@/models/DoctorModel"; 
+
 
 export default function DoctoresPage() {
   const [doctors, setDoctors] = useState<DoctorModel[]>([]);
+  const [filteredDoctors, setFilteredDoctors] = useState<DoctorModel[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [isDoctorsModalOpen, setIsDoctorsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [doctorToDelete, setDoctorToDelete] = useState<DoctorModel | null>(null);
   const [doctor, setDoctor] = useState<DoctorModel | undefined>(undefined);
 
   useEffect(() => {
     const loadDoctors = async () => {
       try {
-        const data = (await fetchDoctors()) as DoctorModel[];
+        const data = await fetchDoctors();
         setDoctors(data);
+        setFilteredDoctors(data);
       } catch (error) {
         console.error("Error fetching doctors:", error);
       } finally {
@@ -30,46 +40,73 @@ export default function DoctoresPage() {
     loadDoctors();
   }, []);
 
-  const handleNewDoctor = () => {
-    setDoctor(undefined);
-    setIsDoctorsModalOpen(true);
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+
+    const filtered = doctors.filter((doctor) =>
+      doctor.name.toLowerCase().includes(value)
+    );
+    setFilteredDoctors(filtered);
   };
 
-  const handleEditDoctor = (doctor: (typeof doctors)[0]) => {
-    setDoctor(doctor);
+  const handleNewDoctor = () => {
+    setDoctor(undefined);
     setIsDoctorsModalOpen(true);
   };
 
   const handleSaveDoctor = async (newDoctor: DoctorModel) => {
     try {
       if (newDoctor.id) {
-        // Update existing doctor
-        const updatedDoctor = (await updateDoctor(
-          newDoctor.id,
-          newDoctor
-        )) as DoctorModel;
+        // Si el doctor ya existe, lo actualizamos
+        const updatedDoctor = await updateDoctor(newDoctor.id, newDoctor);
         setDoctors((prevDoctors) =>
-          prevDoctors.map((doctor) =>
-            doctor.id === newDoctor.id ? updatedDoctor : doctor
-          )
+          prevDoctors.map((doc) => (doc.id === newDoctor.id ? updatedDoctor : doc))
+        );
+        setFilteredDoctors((prevFiltered) =>
+          prevFiltered.map((doc) => (doc.id === newDoctor.id ? updatedDoctor : doc))
         );
       } else {
-        // Add new doctor
-        const createdDoctor = (await addDoctor(newDoctor)) as DoctorModel;
-        setDoctors((prevDoctors) => [...prevDoctors, createdDoctor]);
+        // Si es un nuevo doctor, lo añadimos
+        const createdDoctor = await addDoctor(newDoctor);
+  
+        setDoctors((prevDoctors) => [...prevDoctors, createdDoctor]); // Actualizamos la lista completa
+        setFilteredDoctors((prevFiltered) => [...prevFiltered, createdDoctor]); // Actualizamos la lista filtrada
       }
-      alert("Doctor guardado exitosamente");
     } catch (error) {
-      console.error("Error saving doctor:", error);
-      alert("Error guardando el doctor.");
+      console.error("Error guardando el doctor:", error);
     } finally {
-      setIsDoctorsModalOpen(false);
+      setIsDoctorsModalOpen(false); // Cerramos el modal
     }
   };
+  
 
-  const handleDeleteDoctor = (doctor: (typeof doctors)[0]) => {
-    // TODO: Delete doctor
+  const openDeleteModal = (doctor: DoctorModel) => {
+    setDoctorToDelete(doctor);
     setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteDoctor = async () => {
+    if (doctorToDelete) {
+      try {
+        await deleteDoctor(doctorToDelete.id);
+
+        // Actualizamos el estado eliminando al doctor
+        setDoctors((prevDoctors) =>
+          prevDoctors.filter((doc) => doc.id !== doctorToDelete.id)
+        );
+
+        // Actualizamos los doctores filtrados
+        setFilteredDoctors((prevFiltered) =>
+          prevFiltered.filter((doc) => doc.id !== doctorToDelete.id)
+        );
+      } catch (error) {
+        console.error("Error eliminando el doctor:", error);
+      } finally {
+        setIsDeleteModalOpen(false);
+        setDoctorToDelete(null);
+      }
+    }
   };
 
   return (
@@ -83,20 +120,31 @@ export default function DoctoresPage() {
           Nuevo doctor
         </button>
       </section>
-      <Input name="search" placeholder="Buscar cita" type="search" />
+      <Input
+        name="search"
+        placeholder="Buscar doctor"
+        type="search"
+        value={searchTerm}
+        onChange={handleSearchChange}
+      />
       {loading && <p>Cargando doctores...</p>}
       <DoctorsTable
-        doctors={doctors}
-        onEditDoctor={handleEditDoctor}
-        onDeleteDoctor={handleDeleteDoctor}
+        doctors={filteredDoctors}
+        onEditDoctor={(doc) => {
+          setDoctor(doc);
+          setIsDoctorsModalOpen(true);
+        }}
+        onDeleteDoctor={openDeleteModal}
       />
 
-      <DeleteModal
+      <DeleteModalDoctor
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
         title="Eliminar doctor"
-        message="¿Estás seguro que deseas eliminar este doctor? Esta acción no se puede deshacer."
+        message={`¿Estás seguro que deseas eliminar a ${doctorToDelete?.name}? Esta acción no se puede deshacer.`}
+        onConfirm={confirmDeleteDoctor}
       />
+
 
       <DoctorsModal
         isOpen={isDoctorsModalOpen}
