@@ -1,12 +1,16 @@
-export default function Avatar({ name }: { name: string }) {
-  const getInitials = (name: string) => {
+export default function Avatar({ name }: { name: string | null | undefined }) {
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) {
+      return "NA"; // Default initials when no name is provided
+    }
     const [firstName, lastName] = name.split(" ");
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`;
+    return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`.toUpperCase();
   };
 
   return (
-    <div className="flex items-center justify-center w-8 h-8 bg-purple-300 text-purple-600 rounded-full">
-      <span className="text-xs font-semibold">{getInitials(name)}</span>
+    <div className="avatar">
+      <span>{getInitials(name)}</span>
     </div>
   );
 }
+

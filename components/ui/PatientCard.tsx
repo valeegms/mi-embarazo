@@ -5,7 +5,9 @@ import Avatar from "./Avatar";
 import { OpenInNewRounded } from "@mui/icons-material";
 
 export default function PatientCard({ patient }: { patient: any }) {
+  
   const handleRowClick = (record: string) => {
+    console.log(record);
     window.open(`/doctor/pacientes/${record}`, "_blank");
   };
 
@@ -19,7 +21,6 @@ export default function PatientCard({ patient }: { patient: any }) {
           <h3 className="font-bold">{patient.personalData.name}</h3>
           <p className="text-sm text-gray-400">
             {patient.personalData.age} años |{" "}
-            {patient.pregnancyData.gestationStage} meses de embarazo
           </p>
         </div>
       </section>
