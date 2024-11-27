@@ -33,7 +33,7 @@ export default function DetailsTab(props: TabPanelProps) {
       {value === index && (
         <article className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
           <Card title="Información personal">
-            <section className="grid grid-cols-2 gap-4">
+            <section className="grid grid-cols-2 gap-4 ">
               <Input
                 name="name"
                 label="Nombre"
@@ -141,6 +141,7 @@ export default function DetailsTab(props: TabPanelProps) {
               />
             </section>
           </Card>
+
           <Card title="Datos del embarazo">
             <section className="grid grid-cols-2 gap-4">
               <Input
@@ -205,6 +206,39 @@ export default function DetailsTab(props: TabPanelProps) {
                 className="col-span-2"
                 disabled={!isEditing}
                 value={formData.pregnancyData.observations}
+                onChange={handleChange}
+              />
+            </section>
+          </Card>
+
+          <Card title="Antecedentes médicos" className="col-span-2">
+            <section className="gap-4">
+              <TextField
+                name="medicalConditions"
+                label="Condiciones médicas"
+                disabled={!isEditing}
+                value={formData.medicalConditions}
+                onChange={handleChange}
+              />
+              <TextField
+                name="gynecologicalHistory"
+                label="Historia ginecológica"
+                disabled={!isEditing}
+                value={formData.gynecologicalHistory}
+                onChange={handleChange}
+              />
+              <TextField
+                name="allergies"
+                label="Alergias"
+                disabled={!isEditing}
+                value={formData.allergies}
+                onChange={handleChange}
+              />
+              <TextField
+                name="familyHistory"
+                label="Historial Familiar"
+                disabled={!isEditing}
+                value={formData.familyHistory}
                 onChange={handleChange}
               />
             </section>

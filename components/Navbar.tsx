@@ -11,16 +11,19 @@ import {
   HomeRounded,
   LogoutRounded,
 } from "@mui/icons-material";
-import { username } from "../app/doctor/layout";
 
 export default function Navbar({ role }: { role: string }) {
   const pathname = usePathname();
   const router = useRouter();
 
+  const user_info = JSON.parse(localStorage.getItem("user_info") || "{}");
+  const username = user_info.name;
+
   // Para el cierre de sesión :)
   const handleLogout = () => {
-    localStorage.removeItem("accessToken"); //
-    router.push("/login");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user_info");
+    router.push("/");
   };
 
   return (

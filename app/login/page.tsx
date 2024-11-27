@@ -5,6 +5,8 @@ import Logo from "../../components/ui/Logo";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { loginService } from "../../src/services/loginService";
+import { fetchProfile } from "@/services/perfilService";
+import { UserModel } from "@/models/UserModel";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -52,6 +54,22 @@ export default function LoginPage() {
       }
     }
 
+    try {
+      const response = await fetchProfile();
+      const user: UserModel = new UserModel(
+        response._id,
+        response.name,
+        response.email,
+        response.phone,
+        response.role
+      );
+      localStorage.setItem("user_info", JSON.stringify(user));
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error fetching user data:", error);
+      }
+    }
+
     /* SIMULACIÓN ANTERIOR DE LOGIN
     if (email && password) {
       // Simulación de inicio de sesión
@@ -81,10 +99,8 @@ export default function LoginPage() {
             <p className="text-gray-400 font-light pt-1">
               Ingresa tus credenciales para poder acceder al sitio.
             </p>
-            {/* Formulario con noValidate */}
             <form onSubmit={handleSubmit} noValidate className="pt-4">
               <section className="space-y-8">
-                {/* Input de correo */}
                 <div className="space-y-1">
                   <label className="font-medium" htmlFor="email">
                     Correo electrónico
@@ -116,7 +132,6 @@ export default function LoginPage() {
                   />
                 </div>
 
-                {/* Botón para enviar */}
                 <button
                   type="submit"
                   className="bg-[--primary-color] text-white rounded-md p-2 w-full"
@@ -126,7 +141,6 @@ export default function LoginPage() {
               </section>
             </form>
 
-            {/* Mostrar mensaje de error */}
             {error && (
               <div className="text-red-500 mt-4">
                 <p>{error}</p>

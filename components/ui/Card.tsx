@@ -12,9 +12,7 @@ export default function Card({
   className?: string;
 }) {
   return (
-    <article
-      className={`${className} bg-[--primary-color-light] shadow-md rounded-lg p-6`}
-    >
+    <article className={`${className} bg-[#fff7fe] shadow-md rounded-lg p-6`}>
       {title && (
         <section className="flex justify-between items-center w-full pb-6">
           <span>

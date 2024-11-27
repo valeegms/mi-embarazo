@@ -1,32 +1,56 @@
-import api from "./api";
+import { API_BASE_URL, getHeaders, handleResponse } from './apiConfig';
 
-export const fetchProfile = async (id: string, role:string) => {
+export interface UserData {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+}
+
+export const fetchProfile = async () => {
   try {
-    //solicitud al backend con el email y password
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/doctors/by_id`, {
+    const response = await fetch(`${API_BASE_URL}/users/by_id`, {
       method: "GET",
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/x-www-form-urlencoded",
-        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+        ...getHeaders(),
+        "Content-Type": "application/x-www-form-urlencoded", // Solo necesario para esta llamada específica
       },
-    //   body: new URLSearchParams({
-    //     username: email,
-    //     password: password,
-    //   }),
     });
-
-    //se valida si la respuesta fue exitosa
-    if (!response.ok) {
-      const error: string = await response.json();
-      throw new Error(error || "Fetch doctor failed");
-    }
-
-    //reetorna los datos exitosos
-    const data: string = await response.json();
-    return data;
+    return handleResponse(response);
   } catch (error) {
     console.error("Error en perfilService:", error);
-    throw error; // Lanza el error para manejarlo en LoginPage
+    throw error;
   }
-}
+};
+
+export const verifyPassword = async (email: string, password: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/verify_password`, {
+      method: "POST",
+      headers: getHeaders(),
+      body: JSON.stringify({ email, password }),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error en perfilService:", error);
+    throw error;
+  }
+};
+
+export const updateProfile = async (userData: UserData) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/users/${userData._id}`, {
+      method: "PUT",
+      headers: getHeaders(),
+      body: JSON.stringify({
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+      }),
+    });
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error en perfilService:", error);
+    throw error;
+  }
+};
