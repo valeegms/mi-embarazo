@@ -22,7 +22,6 @@ export default function DoctorsModal({
     if (doctor) {
       setFormData(doctor);
     } else {
-      // Reset form for new doctor records
       setFormData(new DoctorModel("", "", "", "", "", "", "", ""));
     }
   }, [doctor]);
@@ -36,7 +35,9 @@ export default function DoctorsModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted Data: ", formData);
+    if (onSave) {
+      onSave(formData);
+    }
     onClose();
   };
 
@@ -57,10 +58,10 @@ export default function DoctorsModal({
           <div className="flex space-x-2">
             <Input
               label="Especialidad"
-              name="speciality"
+              name="specialization" // Corregido
               type="text"
               className="flex-1"
-              value={formData.speciality}
+              value={formData.specialization} // Corregido
               onChange={handleChange}
             />
             <Input
@@ -97,26 +98,6 @@ export default function DoctorsModal({
             value={formData.password}
             onChange={handleChange}
           />
-          {doctor && (
-            <div className="flex space-x-2">
-              <Input
-                label="Nueva Contraseña"
-                name="newPassword"
-                type="password"
-                className="flex-1"
-                value={formData.password}
-                onChange={handleChange}
-              />
-              <Input
-                label="Confirmar Contraseña"
-                name="confirmPassword"
-                type="password"
-                className="flex-1"
-                value={formData.password}
-                onChange={handleChange}
-              />
-            </div>
-          )}
           <div className="flex space-x-2">
             <div className="space-y-1 flex-1">
               <label
@@ -132,6 +113,7 @@ export default function DoctorsModal({
                 value={formData.gender}
                 onChange={handleChange}
               >
+                <option value="">Selecciona un género</option>
                 <option value="Masculino">Masculino</option>
                 <option value="Femenino">Femenino</option>
               </select>
@@ -150,7 +132,6 @@ export default function DoctorsModal({
             <button
               type="submit"
               className="bg-[--primary-color] text-white rounded-md p-2 w-full"
-              onClick={() => onSave && onSave(formData)}
             >
               Guardar
             </button>
