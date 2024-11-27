@@ -6,7 +6,7 @@ import CitasModal from "@/components/ui/CitasModal";
 import Input from "@/components/ui/Input";
 import DeleteModal from "@/components/ui/DeleteModal";
 import { format, parse } from "date-fns";
-import { doctorCitasService, Appointment } from "@/services/doctorCitasService";
+import { adminCitasService, Appointment } from "@/services/adminCitasService";
 
 const LOCAL_STORAGE_KEY = "appointments";
 
@@ -23,7 +23,7 @@ async function getPatientNameById(patientId: string): Promise<string> {
   }
 }
 
-export default function CitasPage({}: { role: "doctor" | "admin" }) {
+export default function CitasAdminPage({}: { role: "doctor" | "admin" }) {
   const [isCitasModalOpen, setIsCitasModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | undefined>(undefined);
@@ -58,14 +58,13 @@ export default function CitasPage({}: { role: "doctor" | "admin" }) {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const doctorId = "67460503e19d28f60d72c4c3"; // Replace with dynamic doctor ID
-
-        const fetchedAppointments = await doctorCitasService(doctorId);
+        const adminId = "673e14067c3287ff191e3fc8"; // Replace with dynamic doctor ID
+        const fetchedAppointments = await adminCitasService(adminId);
 
         // Transform appointments
         const transformedAppointments = await Promise.all(
           fetchedAppointments.map(async (appointment) => {
-            const patientName = await getPatientNameById(appointment.patient);
+            //const patientName = await getPatientNameById(appointment.patient);
 
             const formattedDate = new Date(appointment.date);
             const formattedDateString = formattedDate.toLocaleDateString("es-ES", {

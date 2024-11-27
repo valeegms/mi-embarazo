@@ -14,10 +14,10 @@ export interface AppointmentsError {
   detail: string;
 }
 
-export async function doctorCitasService(doctorId: string): Promise<Appointment[]> {
+export async function adminCitasService(adminId: string): Promise<Appointment[]> {
   try {
 
-    console.log("Doctor: " + doctorId);
+    console.log("Doctor: " + adminId);
     
     const accessToken = localStorage.getItem("accessToken"); // Lee el token del almacenamiento local
     if (!accessToken) {
@@ -28,7 +28,7 @@ export async function doctorCitasService(doctorId: string): Promise<Appointment[
 
 
     // Realiza una solicitud GET al endpoint específico para las citas de un doctor
-    const response = await fetch(`${API_BASE_URL}/appointments/doctors`, {
+    const response = await fetch(`${API_BASE_URL}/appointments`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${accessToken}`, // Incluye el token aquí
