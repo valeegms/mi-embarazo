@@ -1,4 +1,5 @@
-import { Search } from "@mui/icons-material";
+import { SearchRounded } from "@mui/icons-material";
+import React from "react";
 
 export default function Input({
   name,
@@ -6,9 +7,10 @@ export default function Input({
   type,
   value,
   onChange,
-  placeholder,
-  disabled,
-  className,
+  placeholder = "",
+  disabled = false,
+  error,
+  className = "",
 }: {
   name: string;
   label?: string;
@@ -17,38 +19,41 @@ export default function Input({
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   disabled?: boolean;
+  error?: string; // Optional error message
   className?: string;
 }) {
   return (
     <div className={`${className} py-2 flex flex-col`}>
       {label && (
-        <label className="text-[#8b8b8b] text-sm font-bold" htmlFor={name}>
+        <label className="text-[#8b8b8b] text-sm font-bold mb-1" htmlFor={name}>
           {label}
         </label>
       )}
       <div className="relative">
         <input
           name={name}
-          className={`${
-            disabled
-              ? "border-none bg-transparent text-gray-500 bg-gray-200"
-              : "text-black  p-2"
-          } border py-2 px-2 rounded-md font-medium focus:outline-none w-full ${
-            type === "search" ? "pl-10" : ""
-          }`}
+          id={name} // Ensure `id` matches `name` for accessibility
           type={type}
-          id={label}
           value={value}
           onChange={onChange}
           disabled={disabled}
           placeholder={placeholder}
+          className={`${
+            disabled
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white text-black"
+          } border py-2 px-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-[--primary-color] w-full ${
+            type === "search" ? "pl-10" : ""
+          } ${error ? "border-red-500" : "border-gray-300"}`}
         />
-        {type === "search" ? (
-          <Search className="absolute left-2 top-2 text-[#8b8b8b]" />
-        ) : (
-          ""
+        {/* Dynamic icon rendering */}
+        {type == "search" && (
+          <SearchRounded className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#8b8b8b]" />
         )}
       </div>
+      {error && (
+        <p className="text-red-500 text-xs mt-1 font-medium">{error}</p>
+      )}
     </div>
   );
 }

@@ -1,15 +1,31 @@
 "use client";
 
 import { Button, Tab, Tabs } from "@mui/material";
-import { useState } from "react";
-import DetailsTab from "./PatientRecordTabs/DetailsTab";
-import MedicalHistoryTab from "./PatientRecordTabs/MedicalHistoryTab";
+import DetailsTab from "./PatientRecordTabs/DetailsTab"; // Now includes both details and medical history
 import ControlPrenatalTab from "./PatientRecordTabs/ControlPrenatalTab";
+import { useState } from "react";
 
 export default function PatientRecord({ patient }: { patient: any }) {
   const [tab, setTab] = useState(0);
   const [formData, setFormData] = useState(patient);
   const [isEditing, setIsEditing] = useState(false);
+
+  const commonProps = {
+    isEditing,
+    formData,
+    updateData: (data) => setFormData({ ...formData, ...data }),
+  };
+
+  const tabs = [
+    {
+      label: "Detalles",
+      component: <DetailsTab value={tab} index={0} {...commonProps} />,
+    },
+    {
+      label: "Control prenatal",
+      component: <ControlPrenatalTab value={tab} index={1} {...commonProps} />,
+    },
+  ];
 
   const savePatient = async () => {
     setIsEditing(!isEditing);
@@ -39,44 +55,14 @@ export default function PatientRecord({ patient }: { patient: any }) {
         className="mb-6"
         onChange={(e, newValue) => setTab(newValue)}
       >
-        <Tab value={0} label="Detalles" />
-        <Tab value={1} label="Historial" />
-        <Tab value={2} label="Control prenatal" />
+        {tabs.map((tabItem, index) => (
+          <Tab key={index} value={index} label={tabItem.label} />
+        ))}
       </Tabs>
-      <DetailsTab
-        value={tab}
-        index={0}
-        isEditing={isEditing}
-        formData={{
-          personalData: formData.personalData,
-          pregnancyData: formData.pregnancyData,
-        }}
-        updateData={(data) => {
-          setFormData((prevData) => ({
-            ...prevData,
-            personalData: { ...prevData.personalData, ...data },
-            pregnancyData: { ...prevData.pregnancyData, ...data },
-          }));
-        }}
-      />
-      <MedicalHistoryTab
-        value={tab}
-        index={1}
-        isEditing={isEditing}
-        formData={formData.medicalHistory}
-        updateData={(data) =>
-          setFormData((prevData) => ({ ...prevData, prenatalControl: [data] }))
-        }
-      />
-      <ControlPrenatalTab
-        value={tab}
-        index={2}
-        isEditing={isEditing}
-        formData={formData.prenatalControl}
-        updateData={(data) =>
-          setFormData((prevData) => ({ ...prevData, prenatalControl: [data] }))
-        }
-      />
+      {tabs.map(
+        (tabItem, index) =>
+          tab === index && <div key={index}>{tabItem.component}</div>
+      )}
     </div>
   );
 }

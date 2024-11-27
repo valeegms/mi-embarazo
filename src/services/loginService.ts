@@ -1,4 +1,5 @@
-const API_BASE_URL = "http://localhost:8000";
+import { API_BASE_URL, getHeaders, handleResponse } from './apiConfig';
+import { setCookie } from 'cookies-next';
 
 export interface LoginResponse {
   access_token: string;
@@ -13,31 +14,33 @@ export interface LoginError {
   detail: string;
 }
 
-export async function loginService(email: string, password: string): Promise<LoginResponse> {
+export const loginService = async (email: string, password: string): Promise<LoginResponse> => {
   try {
-    //solicitud al backend con el email y password
     const response = await fetch(`${API_BASE_URL}/login`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
+      headers: getHeaders("application/x-www-form-urlencoded"),
       body: new URLSearchParams({
         username: email,
         password: password,
       }),
     });
 
-    //se valida si la respuesta fue exitosa
-    if (!response.ok) {
-      const error: LoginError = await response.json();
-      throw new Error(error.detail || "Login failed");
-    }
+    const data = await handleResponse<LoginResponse>(response);
 
-    //reetorna los datos exitosos
-    const data: LoginResponse = await response.json();
+    localStorage.setItem("accessToken", data.access_token);
+
+    // Store access token in cookies
+    setCookie('access_token', data.access_token, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      // sameSite: 'none',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: '/',
+    });
+
     return data;
   } catch (error) {
-    console.error("Error en loginService:", error);
-    throw error; // Lanza el error para manejarlo en LoginPage
+    console.error("Error in loginService:", error);
+    throw error;
   }
-}
+};

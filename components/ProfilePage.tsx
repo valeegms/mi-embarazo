@@ -2,41 +2,118 @@
 
 import React, { useEffect, useState } from "react";
 import Avatar from "./ui/Avatar";
-import { username } from "../app/doctor/layout";
 import Input from "./ui/Input";
-import { fetchProfile } from "@/services/perfilService";
-import { fetchDoctors } from "@/services/doctor";
+import { updateProfile, verifyPassword } from "@/services/perfilService";
 
 export default function ProfilePage({ role }: { role: string }) {
-  const [isEditing, setIsEditing] = useState(false); // Toggle between view and edit modes
-  // Dummy user data (replace this with real data later)
-  const [userData, setUserData] = useState({
-    userName: username,
-    userEmail: "johndoe@example.com",
-    userRole: "doctor",
-    userPhone: "123-456-7890",
-    userPassword: "password",
+  const [isEditing, setIsEditing] = useState(false); // Toggle editing
+  const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
+  const [isVerifying, setIsVerifying] = useState(false);
+
+  // Make sure all initial values are defined
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    password: "",
+    currentPassword: "", // New field
+    newPassword: "",
+    confirmPassword: "",
+    role: role || "", // Default to provided role or empty string
   });
 
   useEffect(() => {
-    // Fetch user data from the API
-    console.log("Fetching user data...");
-    fetchProfile("", role).then((data) => {
-      console.log("Doctors: ", data);
-    });
+    const loadProfile = async () => {
+      const user_info = JSON.parse(localStorage.getItem("user_info") || "{}");
+      setFormData((prev) => ({
+        ...prev,
+        ...user_info,
+        // Ensure fields like currentPassword, newPassword, etc. always have initial values
+        currentPassword: user_info.currentPassword || "",
+        newPassword: user_info.newPassword || "",
+        confirmPassword: user_info.confirmPassword || "",
+      }));
+    };
+
+    loadProfile();
   }, []);
 
-  // Handle input changes in edit mode
-  const handleInputChange = (e) => {
+  // Generic input handler
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setUserData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Simulate saving changes (console.log for now)
-  const saveChanges = () => {
-    console.log("Saved user data:", userData);
-    setIsEditing(false); // Exit edit mode
-    alert("Changes saved successfully!"); // Feedback
+  const verifyCurrentPassword = async () => {
+    try {
+      const response = await verifyPassword(
+        formData.email,
+        formData.currentPassword
+      );
+      return response.message;
+    } catch (error) {
+      console.error("Error verifying password:", error);
+      return false;
+    }
+  };
+
+  // Validate form inputs
+  const validateForm = () => {
+    const errors: { [key: string]: string } = {};
+    if (!formData.name) errors.name = "El nombre es obligatorio.";
+    if (!formData.email) errors.email = "El correo es obligatorio.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      errors.email = "Correo inválido.";
+    // Validate password changes
+    if (formData.newPassword) {
+      if (!formData.currentPassword) {
+        errors.currentPassword =
+          "La contraseña actual es obligatoria para cambiar la contraseña.";
+      }
+      if (formData.newPassword !== formData.confirmPassword) {
+        errors.confirmPassword = "Las contraseñas no coinciden.";
+      }
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    setFormErrors({}); // Clear previous errors
+    e.preventDefault();
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    setIsVerifying(true);
+
+    if (formData.newPassword) {
+      const passwordCorrect = await verifyCurrentPassword();
+      if (!passwordCorrect) {
+        setFormErrors({ currentPassword: "Contraseña incorrecta" });
+        setIsVerifying(false);
+        return;
+      }
+    }
+
+    localStorage.setItem("user_info", JSON.stringify(formData));
+
+    try {
+      await updateProfile(formData);
+      setIsEditing(false); // Exit edit mode
+      alert("Cambios guardados con éxito.");
+    } catch (error) {
+      console.error("Error saving profile data:", error);
+      alert("Error al guardar los cambios.");
+    }
+
+    setIsVerifying(false);
+    setIsEditing(false);
+    formErrors.currentPassword = "";
   };
 
   return (
@@ -44,8 +121,9 @@ export default function ProfilePage({ role }: { role: string }) {
       {/* Header Section */}
       <header className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 mb-6 flex items-center gap-4">
         <Avatar
-          className="w-24 h-24 text-4xl"
-          name={userData.userName || "U"}
+          className="w-24 h-24"
+          textSize="xl"
+          name={formData.name || "U"}
         />
         <div>
           <h1 className="text-3xl font-bold text-gray-800">Mi perfil</h1>
@@ -55,124 +133,138 @@ export default function ProfilePage({ role }: { role: string }) {
         </div>
       </header>
 
-      <section className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6 flex flex-col md:flex-row gap-6">
-        <div className="flex-grow">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">
-            Detalles de la cuenta
-          </h2>
-          <div className="space-y-4">
-            <div className="flex justify-between gap-4 items-center">
-              <Input
-                label="Nombre"
-                name="userName"
-                type="text"
-                className="flex-1"
-                value={userData.userName}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-              {role == "admin" && (
-                <div className="flex-1 py-2">
-                  <label
-                    className="text-[#8b8b8b] text-sm font-bold"
-                    htmlFor="userRole"
-                  >
-                    Rol
-                  </label>
-                  {isEditing ? (
-                    <select
-                      name="userRole"
-                      value={userData.userRole}
-                      onChange={handleInputChange}
-                      className="p-2 border border-gray-200 rounded-md w-full"
-                    >
-                      <option value="admin">Admin</option>
-                      <option value="doctor">Doctor</option>
-                    </select>
-                  ) : (
-                    <p className="text-gray-800 p-2 w-2/3 capitalize">
-                      {userData.userRole}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <Input
-                label="Correo"
-                name="userEmail"
-                type="email"
-                className="w-full"
-                value={userData.userEmail}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-              <Input
-                label="Teléfono"
-                name="userRole"
-                type="text"
-                className="w-full"
-                value={userData.userPhone}
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
+      {/* Form Section */}
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-4xl bg-white shadow-md rounded-lg p-6"
+      >
+        <h2 className="text-xl font-semibold text-gray-800 mb-4">
+          Detalles de la cuenta
+        </h2>
+        <div className="space-y-4">
+          {/* Name */}
+          <Input
+            label="Nombre"
+            name="name"
+            type="text"
+            value={formData.name}
+            onChange={handleInputChange}
+            disabled={!isEditing}
+            error={formErrors.name}
+          />
+          {/* Email and Phone */}
+          <div className="flex justify-between gap-4">
             <Input
-              label="Contraseña actual"
-              name="userPassword"
-              type="password"
-              value={userData.userPassword}
+              label="Correo"
+              name="email"
+              type="email"
+              className="flex-1"
+              value={formData.email}
+              onChange={handleInputChange}
+              disabled={!isEditing}
+              error={formErrors.email}
+            />
+            <Input
+              label="Teléfono"
+              name="phone"
+              type="text"
+              className="flex-1"
+              value={formData.phone}
               onChange={handleInputChange}
               disabled={!isEditing}
             />
-            <div className="flex justify-between gap-4">
-              <Input
-                label="Nueva contraseña"
-                name="newPassword"
-                type="password"
-                className="flex-1"
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-              <Input
-                label="Confirmar contraseña"
-                name="confirmPassword"
-                type="password"
-                className="flex-1"
-                onChange={handleInputChange}
-                disabled={!isEditing}
-              />
-            </div>
           </div>
+          {/* Passwords */}
+          {isEditing && (
+            <>
+              <Input
+                label="Actual contraseña"
+                name="currentPassword"
+                type="password"
+                value={formData.currentPassword}
+                onChange={handleInputChange}
+                error={formErrors.currentPassword}
+              />
+              <div className="flex gap-4">
+                <Input
+                  label="Nueva contraseña"
+                  name="newPassword"
+                  type="password"
+                  className="flex-1"
+                  value={formData.newPassword}
+                  onChange={handleInputChange}
+                />
+                <Input
+                  label="Confirmar contraseña"
+                  name="confirmPassword"
+                  type="password"
+                  className="flex-1"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  error={formErrors.confirmPassword}
+                />
+              </div>
+            </>
+          )}
+          {/* Role (Admin Only) */}
+          {role === "admin" && (
+            <div>
+              <label
+                className="text-[#8b8b8b] text-sm font-bold"
+                htmlFor="role"
+              >
+                Rol
+              </label>
+              {isEditing ? (
+                <select
+                  name="role"
+                  value={formData.role}
+                  onChange={handleInputChange}
+                  className="p-2 border border-gray-200 rounded-md w-full"
+                >
+                  <option value="admin">Admin</option>
+                  <option value="doctor">Doctor</option>
+                </select>
+              ) : (
+                <p className="text-gray-800 p-2 w-2/3 capitalize">
+                  {formData.role}
+                </p>
+              )}
+            </div>
+          )}
         </div>
-      </section>
 
-      <footer className="pt-6 w-full max-w-4xl flex gap-4">
-        {isEditing ? (
-          <>
+        <footer className="pt-6 flex gap-4">
+          {!isEditing && (
             <button
-              onClick={saveChanges}
+              type="button"
+              onClick={() => setIsEditing(true)}
               className="flex-1 bg-[--primary-color] text-white rounded-md p-2 w-full transition"
             >
-              Guardar
+              Editar
             </button>
-            <button
-              onClick={() => setIsEditing(false)}
-              className="flex-1 bg-red-100 text-red-700 rounded-md p-2 w-full hover:bg-red-200 transition"
-            >
-              Cancelar
-            </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex-1 bg-[--primary-color] text-white rounded-md p-2 w-full transition"
-          >
-            Editar
-          </button>
-        )}
-      </footer>
+          )}
+
+          {isEditing && (
+            <>
+              <button
+                type="submit" // Submit form for saving changes
+                disabled={isVerifying}
+                className="flex-1 bg-[--primary-color] text-white rounded-md p-2 w-full transition"
+              >
+                {isVerifying ? "Verificando..." : "Guardar"}
+              </button>
+              <button
+                type="button" // Only toggle edit mode
+                onClick={() => setIsEditing(false)}
+                className="flex-1 bg-red-100 text-red-700 rounded-md p-2 w-full hover:bg-red-200 transition"
+              >
+                Cancelar
+              </button>
+            </>
+          )}
+        </footer>
+      </form>
     </main>
   );
 }
