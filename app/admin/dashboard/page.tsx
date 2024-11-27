@@ -41,7 +41,9 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center">
             <div>
               <small className="font-semibold">Doctores</small>
-              <h2 className="text-5xl font-bold text-black">{counts.doctors}</h2>
+              <h2 className="text-5xl font-bold text-black">
+                {counts.doctors}
+              </h2>
             </div>
             <FaceRounded className="text-[--primary-color] text-6xl" />
           </div>
@@ -50,7 +52,9 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center">
             <div>
               <small className="font-semibold">Pacientes</small>
-              <h2 className="text-5xl font-bold text-black">{counts.patients}</h2>
+              <h2 className="text-5xl font-bold text-black">
+                {counts.patients}
+              </h2>
             </div>
             <GroupRounded className="text-[--primary-color] text-6xl" />
           </div>

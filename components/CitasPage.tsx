@@ -81,6 +81,7 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
         appointments={appointments}
         onEdit={handleEditAppointment}
         onDelete={handleDeleteAppointment}
+        role={role}
       />
 
       <DeleteModal

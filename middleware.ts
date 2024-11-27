@@ -9,15 +9,10 @@ export function middleware(request: NextRequest) {
     const isPublicRoute = publicRoutes.includes(path); // Check if the path is public
 
     const token = request.cookies.get('access_token');  // Get the token from cookies
-    console.log("Path: ", request.nextUrl.pathname);
 
     if ((!isPublicRoute && !token)) {
         return NextResponse.redirect(new URL('/login', request.nextUrl));
     }
-
-    // if (isPublicRoute && token) {
-    //     return NextResponse.redirect(new URL('/doctor/dashboard', request.nextUrl));
-    // }
 
     return NextResponse.next();  // Allow the request to continue if no conditions match
 }

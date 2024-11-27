@@ -23,6 +23,7 @@ type AppointmentsTableProps = {
   appointments: Appointment[];
   onEdit: (appointment: Appointment) => void;
   onDelete: (appointment: Appointment) => void;
+  role: "doctor" | "admin";
 };
 
 const getTypeChipColor = (
@@ -55,6 +56,7 @@ export default function AppointmentsTable({
   appointments,
   onEdit,
   onDelete,
+  role,
 }: AppointmentsTableProps) {
   return (
     <TableContainer component={Paper} className="pt-6">
@@ -107,12 +109,14 @@ export default function AppointmentsTable({
                   >
                     <Edit />
                   </button>
-                  <button
-                    className="bg-red-100 px-2 py-1 rounded text-red-800 hover:bg-red-600 hover:bg-opacity-25"
-                    onClick={() => onDelete(appointment)}
-                  >
-                    <DeleteRounded />
-                  </button>
+                  {role == "admin" && (
+                    <button
+                      className="bg-red-100 px-2 py-1 rounded text-red-800 hover:bg-red-600 hover:bg-opacity-25"
+                      onClick={() => onDelete(appointment)}
+                    >
+                      <DeleteRounded />
+                    </button>
+                  )}
                 </div>
               </TableCell>
             </TableRow>
