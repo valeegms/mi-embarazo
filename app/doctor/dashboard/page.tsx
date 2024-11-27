@@ -8,6 +8,7 @@ import Appointment from "../../../components/ui/Appointment";
 import { OpenInNewRounded } from "@mui/icons-material";
 
 import ControlPrenatalForm from "../../../components/ControlPrenatalFrom";
+import { Tooltip } from "@mui/material";
 
 const currentDate = new Date().toLocaleDateString("es-ES", {
   year: "numeric",

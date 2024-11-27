@@ -12,8 +12,9 @@ export const fetchProfile = async () => {
     const response = await fetch(`${API_BASE_URL}/users/by_id`, {
       method: "GET",
       headers: {
-        ...getHeaders(),
-        "Content-Type": "application/x-www-form-urlencoded", // Solo necesario para esta llamada específica
+        "Accept": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
       },
     });
     return handleResponse(response);

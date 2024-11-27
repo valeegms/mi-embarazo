@@ -12,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   // Expresión regular para validar formato del correo
@@ -38,12 +39,35 @@ export default function LoginPage() {
       return;
     }
 
-    // Nueva lógica: Llamar al servicio de login
-    try {
-      const response = await loginService(email, password);
+    setIsLoading(true);
+    setError("");
 
-      // Guardar el token y redirigir al dashboard
-      localStorage.setItem("accessToken", response.access_token);
+    try {
+      // Iniciar ambas solicitudes en paralelo
+      const loginResponse = await loginService(email, password);
+
+      // Guardar el token
+      localStorage.setItem("accessToken", loginResponse.access_token);
+
+      // Fetch user profile information
+      const profileResponse = await fetchProfile();
+      const userResponse = profileResponse as {
+        _id: string;
+        name: string;
+        email: string;
+        phone: string;
+        role: string;
+      };
+      const user: UserModel = new UserModel(
+        userResponse._id,
+        userResponse.name,
+        userResponse.email,
+        userResponse.phone,
+        userResponse.role
+      );
+      localStorage.setItem("user_info", JSON.stringify(user));
+
+      // Redirigir al dashboard
       router.push("/doctor/dashboard");
     } catch (error: unknown) {
       // Manejo de error
@@ -52,37 +76,13 @@ export default function LoginPage() {
       } else {
         setError("Ocurrió un error inesperado.");
       }
+    } finally {
+      setIsLoading(false);
     }
-
-    try {
-      const response = await fetchProfile();
-      const user: UserModel = new UserModel(
-        response._id,
-        response.name,
-        response.email,
-        response.phone,
-        response.role
-      );
-      localStorage.setItem("user_info", JSON.stringify(user));
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error("Error fetching user data:", error);
-      }
-    }
-
-    /* SIMULACIÓN ANTERIOR DE LOGIN
-    if (email && password) {
-      // Simulación de inicio de sesión
-      localStorage.setItem("isLoggedIn", "true");
-      router.push("/doctor/dashboard");
-    } else {
-      setError("Invalid credentials");
-    }
-    */
   };
 
   return (
-    <main className="h-screen">
+    <div className="h-screen">
       <article className="flex p-4 h-full space-x-8">
         <section className="relative w-1/2">
           <Image
@@ -134,9 +134,10 @@ export default function LoginPage() {
 
                 <button
                   type="submit"
-                  className="bg-[--primary-color] text-white rounded-md p-2 w-full"
+                  className="bg-[--primary-color] text-white rounded-md p-2 w-full disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  disabled={isLoading}
                 >
-                  Ingresar
+                  {isLoading ? "Cargando..." : "Ingresar"}
                 </button>
               </section>
             </form>
@@ -149,6 +150,6 @@ export default function LoginPage() {
           </div>
         </section>
       </article>
-    </main>
+    </div>
   );
 }

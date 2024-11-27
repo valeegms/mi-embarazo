@@ -1,4 +1,5 @@
 import { API_BASE_URL, getHeaders, handleResponse } from './apiConfig';
+import { setCookie } from 'cookies-next';
 
 export interface LoginResponse {
   access_token: string;
@@ -24,9 +25,22 @@ export const loginService = async (email: string, password: string): Promise<Log
       }),
     });
 
-    return handleResponse<LoginResponse>(response);
+    const data = await handleResponse<LoginResponse>(response);
+
+    localStorage.setItem("accessToken", data.access_token);
+
+    // Store access token in cookies
+    setCookie('access_token', data.access_token, {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      // sameSite: 'none',
+      maxAge: 60 * 60 * 24 * 30, // 30 days
+      path: '/',
+    });
+
+    return data;
   } catch (error) {
-    console.error("Error en loginService:", error);
-    throw error; // Lanza el error para manejarlo en LoginPage
+    console.error("Error in loginService:", error);
+    throw error;
   }
 };

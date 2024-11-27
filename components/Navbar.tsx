@@ -11,19 +11,24 @@ import {
   HomeRounded,
   LogoutRounded,
 } from "@mui/icons-material";
+import { deleteCookie } from "cookies-next";
 
 export default function Navbar({ role }: { role: string }) {
-  const pathname = usePathname();
   const router = useRouter();
+  const pathname = usePathname();
 
   const user_info = JSON.parse(localStorage.getItem("user_info") || "{}");
   const username = user_info.name;
 
   // Para el cierre de sesión :)
   const handleLogout = () => {
+    deleteCookie("access_token", {
+      path: "/",
+    });
+
     localStorage.removeItem("accessToken");
     localStorage.removeItem("user_info");
-    router.push("/");
+    router.push("/login");
   };
 
   return (
@@ -79,14 +84,14 @@ export default function Navbar({ role }: { role: string }) {
               Pacientes
             </Link>
           </section>
-          <Link
-            className="flex items-center space-x-14"
-            href={`/${role}/perfil`}
-          >
-            <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-14">
+            <Link
+              className="flex items-center space-x-2"
+              href={`/${role}/perfil`}
+            >
               <Avatar name={username} />
               <span className="font-medium"> {username} </span>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="flex font-bold text-[--primary-color] hover:text-[--primary-color-dark]"
@@ -94,7 +99,7 @@ export default function Navbar({ role }: { role: string }) {
               <LogoutRounded />
               Cerrar sesión
             </button>
-          </Link>
+          </div>
         </article>
       </div>
     </nav>
