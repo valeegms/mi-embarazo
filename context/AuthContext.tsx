@@ -2,9 +2,9 @@
 
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { loginService } from "@/services/loginService";
-import { fetchProfile } from "@/services/perfilService";
-import { UserModel } from "@/models/UserModel";
+import { loginService } from "@/src/services/loginService";
+import { fetchProfile } from "@/src/services/perfilService";
+import { UserModel } from "@/src/models/UserModel";
 
 interface AuthContextProps {
   user: UserModel | null; // User data
@@ -40,6 +40,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const loginResponse = await loginService(email, password);
       const token = loginResponse.access_token;
 
+      
+
       // Step 2: Fetch user profile using the token
       const profileResponse = await fetchProfile();
       const userResponse = profileResponse as {
@@ -57,6 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userResponse.phone,
         userResponse.role
       );
+
 
       // Step 3: Store data in localStorage and update context
       localStorage.setItem("accessToken", token);

@@ -20,7 +20,7 @@ export async function doctorCitasService(doctorId: string): Promise<Appointment[
 
     console.log("Doctor: " + doctorId);
     
-    const accessToken = localStorage.getItem("accessToken"); // Lee el token del almacenamiento local
+    const accessToken = localStorage.getItem("access_token"); // Lee el token del almacenamiento local
     if (!accessToken) {
       throw new Error("Access token no encontrado");
     }else{

@@ -10,7 +10,7 @@ import {
 import Badge from "./Badge";
 import { DeleteRounded, Edit } from "@mui/icons-material";
 
-import { Appointment as BaseAppointment} from "@/services/doctorCitasService";
+import { Appointment as BaseAppointment} from "@/src/services/doctorCitasService";
 
 type Appointment = BaseAppointment & {
   additionalProperty?: string; // Agrega las propiedades necesarias
@@ -29,7 +29,7 @@ const getTypeChipColor = (
   switch (type) {
     case "Nuevo paciente":
       return { color: "warning" };
-    case "Seguimiento":
+    case "Virtual":
       return { color: "secondary" };
     default:
       return { color: "primary" };
@@ -42,7 +42,7 @@ const getStatusChipColor = (
   switch (status) {
     case "Confirmada":
       return { color: "success" };
-    case "Cancelada":
+    case "Pendiente":
       return { color: "danger" };
     default:
       return { color: "primary" };
@@ -84,10 +84,10 @@ export default function AppointmentsTable({
         <TableBody>
           {appointments.map((appointment, index) => (
             <TableRow key={index}>
-              <TableCell>{appointment.patient}</TableCell>
+              <TableCell>{appointment.name}</TableCell>
               <TableCell>{appointment.record}</TableCell>
               <TableCell>{appointment.date}</TableCell>
-              <TableCell>{appointment.time}</TableCell>
+              <TableCell>{appointment.time + " A.M."}</TableCell>
               <TableCell>
                 <Badge type={getTypeChipColor(appointment.date_type).color}>
                   {appointment.date_type}
