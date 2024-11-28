@@ -14,10 +14,10 @@ export default function DashboardLayout({
   const { user } = useAuth();
   const router = useRouter();
 
-  if (user && user.role !== "doctor") {
-    router.push("/unauthorized");
-    return null;
-  }
+  // if (user && user.role !== "doctor") {
+  //   router.push("/unauthorized");
+  //   return null;
+  // }
 
   return (
     <>

@@ -5,12 +5,13 @@ import Avatar from "./Avatar";
 import { DeleteRounded, OpenInNewRounded } from "@mui/icons-material";
 import { useState } from "react";
 import DeleteModal from "./DeleteModal";
+import { PatientModel } from "@/src/models/PatientModel";
 
 export default function PatientCard({
   patient,
   role,
 }: {
-  patient: any;
+  patient: PatientModel;
   role: string;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);

@@ -14,6 +14,36 @@ import {
 
 const LOCAL_STORAGE_KEY = "appointments";
 
+const citas: Appointment[] = [
+  {
+    patient_name: "Ana López",
+    record: "REC123456",
+    date: "2024-11-30",
+    time: "10:00 AM",
+    date_type: "Consulta general",
+    status: "Confirmada",
+    patient: "1",
+  },
+  {
+    patient_name: "María Fernández",
+    record: "REC654322",
+    date: "2024-12-01",
+    time: "02:00 PM",
+    date_type: "Control prenatal",
+    status: "Confirmada",
+    patient: "2",
+  },
+  {
+    patient_name: "Carla Gómez",
+    record: "REC789012",
+    date: "2024-11-25",
+    time: "04:00 PM",
+    date_type: "Control prenatal",
+    status: "Confirmada",
+    patient: "3",
+  },
+];
+
 // Function to get the patient's name by their ID
 async function getPatientNameById(patientId: string): Promise<string> {
   try {
@@ -65,79 +95,79 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
 
   // Fetch appointments and transform them
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        let fetchedAppointments;
-        if (role === "doctor") {
-          fetchedAppointments = await getAppointmentByDoctor();
-        } else {
-          fetchedAppointments = await getAllAppointments();
-        }
+    setAppointments(citas);
+    // const fetchAppointments = async () => {
+    //   try {
+    //     let fetchedAppointments;
+    //     if (role === "doctor") {
+    //       fetchedAppointments = await getAppointmentByDoctor();
+    //     } else {
+    //       fetchedAppointments = await getAllAppointments();
+    //     }
 
-        // Transform appointments
-        const transformedAppointments = await Promise.all(
-          fetchedAppointments.map(async (appointment) => {
-            const formattedDate = new Date(appointment.date);
-            const formattedDateString = formattedDate.toLocaleDateString(
-              "es-ES",
-              {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }
-            );
+    //     // Transform appointments
+    //     const transformedAppointments = await Promise.all(
+    //       fetchedAppointments.map(async (appointment) => {
+    //         const formattedDate = new Date(appointment.date);
+    //         const formattedDateString = formattedDate.toLocaleDateString(
+    //           "es-ES",
+    //           {
+    //             year: "numeric",
+    //             month: "2-digit",
+    //             day: "2-digit",
+    //           }
+    //         );
 
-            const normalizeTime = (time: string): string => {
-              const hasAmPm = /[APap][Mm]$/.test(time);
-              if (hasAmPm) {
-                const parsedTime = parse(time, "hh:mm a", new Date());
-                return format(parsedTime, "HH:mm");
-              }
-              return time;
-            };
+    //         const normalizeTime = (time: string): string => {
+    //           const hasAmPm = /[APap][Mm]$/.test(time);
+    //           if (hasAmPm) {
+    //             const parsedTime = parse(time, "hh:mm a", new Date());
+    //             return format(parsedTime, "HH:mm");
+    //           }
+    //           return time;
+    //         };
 
-            const translateType = (type: string): string => {
-              switch (type) {
-                case "Consultation":
-                  return "Nuevo paciente";
-                case "virtual":
-                  return "Virtual";
-                case "presencial":
-                  return "Presencial";
-                default:
-                  return type;
-              }
-            };
+    //         const translateType = (type: string): string => {
+    //           switch (type) {
+    //             case "Consultation":
+    //               return "Nuevo paciente";
+    //             case "virtual":
+    //               return "Virtual";
+    //             case "presencial":
+    //               return "Presencial";
+    //             default:
+    //               return type;
+    //           }
+    //         };
 
-            const translateStatus = (status: string): string => {
-              switch (status) {
-                case "pending":
-                  return "Pendiente";
-                case "Scheduled":
-                  return "Confirmada";
-                default:
-                  return status;
-              }
-            };
+    //         const translateStatus = (status: string): string => {
+    //           switch (status) {
+    //             case "pending":
+    //               return "Pendiente";
+    //             case "Scheduled":
+    //               return "Confirmada";
+    //             default:
+    //               return status;
+    //           }
+    //         };
 
-            return {
-              ...appointment,
-              name: "Lenin Gael",
-              date: formattedDateString,
-              time: normalizeTime(appointment.time),
-              type: translateType(appointment.date_type),
-              status: translateStatus(appointment.status),
-            };
-          })
-        );
+    //         return {
+    //           ...appointment,
+    //           date: formattedDateString,
+    //           time: normalizeTime(appointment.time),
+    //           type: translateType(appointment.date_type),
+    //           status: translateStatus(appointment.status),
+    //         };
+    //       })
+    //     );
 
-        setAppointments(transformedAppointments);
-      } catch (error) {
-        console.error("Error al obtener las citas:", error);
-      }
-    };
+    //     setAppointments(transformedAppointments);
+    //   } catch (error) {
+    //     console.error("Error al obtener las citas:", error);
+    //   }
+    // };
 
-    fetchAppointments();
+    // fetchAppointments();
   }, []);
 
   useEffect(() => {

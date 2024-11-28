@@ -111,3 +111,20 @@ export async function updateAppointmentDetails(id: string, appointment: Appointm
   }
 }
 
+export async function deleteAppointment(id: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/appointments/${id}`, {
+      method: "DELETE",
+      headers: getHeaders(),
+    });
+
+    if (!response.ok) {
+      throw new Error("Error deleting appointment");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error al obtener citas:", error);
+    throw error; // Relanza el error para manejo adicional
+  }
+}

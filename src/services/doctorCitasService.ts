@@ -1,7 +1,7 @@
 const API_BASE_URL = "http://localhost:8000";
 
 export type Appointment = {
-  name: string;
+  patient_name: string;
   record: string;
   date: string;
   time: string;

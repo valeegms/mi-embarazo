@@ -4,8 +4,8 @@ export class PatientModel {
     name: string;
     personalData: PersonalData;
     current_phone: string;
-    doctor_options: [];
-    schedule_options: [];
+    doctor_options: unknown[];
+    schedule_options: unknown[];
     doctor: string;
     date: string;
     pregnancyData: PregnancyData;
@@ -17,8 +17,8 @@ export class PatientModel {
         name: string = '',
         personalData: PersonalData = new PersonalData('','','',0,'','','','','',{},'','','','',''),
         current_phone: string = '',
-        doctor_options: [] = [],
-        schedule_options: [] = [],
+        doctor_options: unknown[] = [],
+        schedule_options: unknown[] = [],
         doctor: string = '',
         date: string = '',
         pregnancyData: PregnancyData = new PregnancyData('','','',0,0,'','',''),

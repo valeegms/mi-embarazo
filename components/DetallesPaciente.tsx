@@ -5,6 +5,7 @@ import Avatar from "./ui/Avatar";
 import PatientRecord from "./ui/PatientRecord";
 import { useEffect, useState } from "react";
 import { PatientModel } from "@/src/models/PatientModel";
+import { patients } from "./PacientesPage";
 
 export default function DetallesPaciente({
   params,
@@ -15,13 +16,21 @@ export default function DetallesPaciente({
   const [patient, setPatient] = useState<PatientModel>(new PatientModel());
 
   useEffect(() => {
-    const fetchPatient = async () => {
-      const fetchedPatient = await getPatientById(record);
-      setPatient(fetchedPatient);
-    };
-
-    fetchPatient();
+    patients.map((patient) => {
+      if (patient.record === record) {
+        setPatient(patient);
+      }
+    });
   }, []);
+
+  // useEffect(() => {
+  //   const fetchPatient = async () => {
+  //     const fetchedPatient = await getPatientById(record);
+  //     setPatient(fetchedPatient);
+  //   };
+
+  //   fetchPatient();
+  // }, []);
 
   const lastAppointmentDate = new Date(patient.date).toLocaleDateString(
     "es-MX",

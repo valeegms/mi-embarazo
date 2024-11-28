@@ -1,6 +1,7 @@
 import { Modal } from "@mui/material";
 import Input from "./Input";
 import { useEffect, useState } from "react";
+import { Appointment } from "@/src/services/doctorCitasService";
 
 export default function CitasModal({
   isOpen,
@@ -9,22 +10,16 @@ export default function CitasModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  appointment?: {
-    name: string;
-    record: string;
-    date: string;
-    time: string;
-    type: string;
-    status: string;
-  };
+  appointment?: Appointment;
 }) {
-  const [formData, setFormData] = useState({
-    name: "",
+  const [formData, setFormData] = useState<Appointment>({
+    patient_name: "",
     record: "",
     date: "",
     time: "",
-    type: "Nuevo paciente",
-    status: "Confirmada",
+    date_type: "",
+    status: "",
+    patient: "",
   });
 
   useEffect(() => {
@@ -33,12 +28,13 @@ export default function CitasModal({
     } else {
       // Reset form for new appointments
       setFormData({
-        name: "",
+        patient_name: "",
         record: "",
         date: "",
         time: "",
-        type: "Nuevo paciente",
-        status: "Confirmada",
+        date_type: "",
+        status: "",
+        patient: "",
       });
     }
   }, [appointment]);
@@ -74,11 +70,13 @@ export default function CitasModal({
             name="paciente"
             className="p-2 border border-gray-200 rounded-md w-full"
             onChange={handleChange}
-            value={appointment?.name}
+            value={appointment?.patient_name}
             disabled={appointment !== undefined}
           >
             {appointment ? (
-              <option value={appointment.name}>{appointment.name}</option>
+              <option value={appointment.patient_name}>
+                {appointment.patient_name}
+              </option>
             ) : (
               <option value="">Seleccionar paciente</option>
             )}

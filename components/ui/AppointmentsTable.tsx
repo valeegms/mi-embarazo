@@ -10,7 +10,7 @@ import {
 import Badge from "./Badge";
 import { DeleteRounded, Edit } from "@mui/icons-material";
 
-import { Appointment as BaseAppointment} from "@/src/services/doctorCitasService";
+import { Appointment as BaseAppointment } from "@/src/services/doctorCitasService";
 
 type Appointment = BaseAppointment & {
   additionalProperty?: string; // Agrega las propiedades necesarias
@@ -84,7 +84,7 @@ export default function AppointmentsTable({
         <TableBody>
           {appointments.map((appointment, index) => (
             <TableRow key={index}>
-              <TableCell>{appointment.name}</TableCell>
+              <TableCell>{appointment.patient_name}</TableCell>
               <TableCell>{appointment.record}</TableCell>
               <TableCell>{appointment.date}</TableCell>
               <TableCell>{appointment.time + " A.M."}</TableCell>

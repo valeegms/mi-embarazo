@@ -64,6 +64,12 @@ export default function DashboardPage() {
         formData.date
       ).finally(() => setIsSavingDetails(false));
 
+      appointments.map((app) => {
+        if (app.patient === appointment.patient) {
+          app.status = "Finalizada";
+        }
+      });
+
       setCurrentPatient(null); // Ends the current appointment
       localStorage.removeItem("currentPatient");
       localStorage.removeItem("currentPatientDetails");
