@@ -15,7 +15,7 @@ export default function Input({
   name: string;
   label?: string;
   type: string;
-  value?: string;
+  value?: string | number;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   disabled?: boolean;

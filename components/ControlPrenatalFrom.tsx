@@ -1,16 +1,10 @@
 import React from "react";
 import Input from "./ui/Input";
 import TextField from "./ui/TextField";
+import { AppointmentDetailsModel } from "@/src/models/AppointmentModel";
 
 interface ControlPrenatalFormProps {
-  formData: {
-    weight: string;
-    bloodPressure: string;
-    fetalHeartRate: string;
-    fetalStatus: string;
-    observations: string;
-    prescription: string;
-  };
+  formData: AppointmentDetailsModel;
   updateData: (data: (prevData: any) => any) => void;
   isEditing: boolean;
 }

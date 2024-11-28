@@ -1,11 +1,12 @@
 import Input from "../Input";
 import Card from "../Card";
 import TextField from "../TextField";
+import { PatientModel } from "@/src/models/PatientModel";
 
 export interface TabPanelProps {
   index: number;
   value: number;
-  formData: any;
+  formData: PatientModel;
   updateData: any;
   isEditing?: boolean;
 }
@@ -40,7 +41,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.name}
+                value={formData?.name}
               />
               <Input
                 name="maritalStatus"
@@ -48,7 +49,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.maritalStatus}
+                value={formData?.personalData?.maritalStatus}
               />
               <Input
                 name="gender"
@@ -56,7 +57,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.gender}
+                value={formData?.personalData?.gender}
               />
               <Input
                 name="occupation"
@@ -64,7 +65,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.occupation}
+                value={formData?.personalData?.occupation}
               />
               <Input
                 name="phone"
@@ -72,7 +73,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.phone}
+                value={formData?.personalData?.phone}
               />
               <Input
                 name="street"
@@ -81,7 +82,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 disabled={!isEditing}
                 className="row-span-2"
                 onChange={handleChange}
-                value={formData.personalData.address.street}
+                value={formData?.personalData?.address?.street}
               />
               <Input
                 name="age"
@@ -89,7 +90,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="number"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.age}
+                value={formData?.personalData?.age}
               />
               <Input
                 name="birthDate"
@@ -97,7 +98,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="date"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.birthDate}
+                value={formData?.personalData?.birthDate}
               />
               <Input
                 name="municipality"
@@ -105,7 +106,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.address.municipality}
+                value={formData?.personalData?.address?.municipality}
               />
               <Input
                 name="locality"
@@ -113,7 +114,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.address.locality}
+                value={formData?.personalData?.address?.locality}
               />
               <Input
                 name="state"
@@ -121,7 +122,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.address.state}
+                value={formData?.personalData?.address?.state}
               />
               <Input
                 name="email"
@@ -129,7 +130,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="email"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.email}
+                value={formData?.personalData?.email}
               />
               <Input
                 name="curp"
@@ -137,7 +138,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData.personalData.curp}
+                value={formData?.personalData?.curp}
               />
             </section>
           </Card>
@@ -149,7 +150,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Fecha de última menstruación"
                 type="date"
                 disabled={!isEditing}
-                value={formData.pregnancyData.lastMenstruation}
+                value={formData?.pregnancyData?.lastMenstruation}
                 onChange={handleChange}
               />
               <Input
@@ -157,7 +158,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Fecha probable de parto"
                 type="date"
                 disabled={!isEditing}
-                value={formData.pregnancyData.dueDate}
+                value={formData?.pregnancyData?.dueDate}
                 onChange={handleChange}
               />
               <Input
@@ -165,7 +166,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Edad gestacional (semana)"
                 type="number"
                 disabled={!isEditing}
-                value={formData.pregnancyData.gestationStage}
+                value={formData?.pregnancyData?.gestationStage}
                 onChange={handleChange}
               />
               <Input
@@ -173,7 +174,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Número de embarazo"
                 type="number"
                 disabled={!isEditing}
-                value={formData.pregnancyData.previousPregnancies + 1}
+                value={formData?.pregnancyData?.previousPregnancies}
                 onChange={handleChange}
               />
               <Input
@@ -181,7 +182,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Número de abortos"
                 type="number"
                 disabled={!isEditing}
-                value={formData.pregnancyData.abortions}
+                value={formData?.pregnancyData?.abortions}
                 onChange={handleChange}
               />
               <Input
@@ -189,7 +190,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Tipo de embarazo"
                 type="text"
                 disabled={!isEditing}
-                value={formData.pregnancyData.pregnancyType}
+                value={formData?.pregnancyData?.pregnancyType}
                 onChange={handleChange}
               />
               <TextField
@@ -197,7 +198,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Complicaciones"
                 className="col-span-2"
                 disabled={!isEditing}
-                value={formData.pregnancyData.complications}
+                value={formData?.pregnancyData?.complication}
                 onChange={handleChange}
               />
               <TextField
@@ -205,7 +206,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 label="Observaciones"
                 className="col-span-2"
                 disabled={!isEditing}
-                value={formData.pregnancyData.observations}
+                value={formData?.pregnancyData?.observations}
                 onChange={handleChange}
               />
             </section>
@@ -217,28 +218,28 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="medicalConditions"
                 label="Condiciones médicas"
                 disabled={!isEditing}
-                value={formData.medicalConditions}
+                value={formData?.medicalHistory?.medicalConditions}
                 onChange={handleChange}
               />
               <TextField
                 name="gynecologicalHistory"
                 label="Historia ginecológica"
                 disabled={!isEditing}
-                value={formData.gynecologicalHistory}
+                value={formData?.medicalHistory?.gynecologicalHistory}
                 onChange={handleChange}
               />
               <TextField
                 name="allergies"
                 label="Alergias"
                 disabled={!isEditing}
-                value={formData.allergies}
+                value={formData?.medicalHistory?.allergies}
                 onChange={handleChange}
               />
               <TextField
                 name="familyHistory"
                 label="Historial Familiar"
                 disabled={!isEditing}
-                value={formData.familyHistory}
+                value={formData?.medicalHistory?.familyHistory}
                 onChange={handleChange}
               />
             </section>

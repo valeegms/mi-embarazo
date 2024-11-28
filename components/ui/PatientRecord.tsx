@@ -1,19 +1,33 @@
 "use client";
 
-import { Button, Tab, Tabs } from "@mui/material";
+import { Button, Skeleton, Tab, Tabs } from "@mui/material";
 import DetailsTab from "./PatientRecordTabs/DetailsTab"; // Now includes both details and medical history
 import ControlPrenatalTab from "./PatientRecordTabs/ControlPrenatalTab";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { PatientModel } from "@/src/models/PatientModel";
+import { savePatientDetails } from "@/src/services/pacienteService";
 
-export default function PatientRecord({ patient }: { patient: any }) {
+export default function PatientRecord({ patient }: { patient: PatientModel }) {
   const [tab, setTab] = useState(0);
-  const [formData, setFormData] = useState(patient);
+  const [formData, setFormData] = useState<PatientModel>(new PatientModel());
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (patient) {
+      setFormData(patient);
+      console.log("Patient data:", formData);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
+  }, [patient]);
 
   const commonProps = {
     isEditing,
     formData,
-    updateData: (data) => setFormData({ ...formData, ...data }),
+    updateData: (patient: PatientModel) =>
+      setFormData({ ...formData, ...patient }),
   };
 
   const tabs = [
@@ -27,21 +41,27 @@ export default function PatientRecord({ patient }: { patient: any }) {
     },
   ];
 
-  const savePatient = async () => {
-    setIsEditing(!isEditing);
-    await fetch(`http://localhost:4000/patients/${formData.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    })
-      .then((res) => res.json())
-      .then((data) => console.log(data));
+  const handleSaveButton = async () => {
+    if (isEditing) {
+      try {
+        setIsLoading(true);
+
+        await savePatientDetails(formData!.id, formData!);
+      } catch (error) {
+        console.error("Error saving patient details:", error);
+      } finally {
+        setIsLoading(false);
+        setIsEditing(false);
+      }
+    } else {
+      setIsEditing(true);
+    }
   };
 
   return (
     <div>
       <Button
-        onClick={savePatient}
+        onClick={handleSaveButton}
         variant="contained"
         color="secondary"
         className="float-end"
@@ -59,9 +79,13 @@ export default function PatientRecord({ patient }: { patient: any }) {
           <Tab key={index} value={index} label={tabItem.label} />
         ))}
       </Tabs>
-      {tabs.map(
-        (tabItem, index) =>
-          tab === index && <div key={index}>{tabItem.component}</div>
+      {!isLoading ? (
+        tabs.map(
+          (tabItem, index) =>
+            tab === index && <div key={index}>{tabItem.component}</div>
+        )
+      ) : (
+        <Skeleton variant="rectangular" height={400} />
       )}
     </div>
   );

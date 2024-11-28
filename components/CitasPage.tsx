@@ -6,9 +6,11 @@ import CitasModal from "@/components/ui/CitasModal";
 import Input from "@/components/ui/Input";
 import DeleteModal from "@/components/ui/DeleteModal";
 import { format, parse } from "date-fns";
-import { doctorCitasService, Appointment} from "@/src/services/doctorCitasService";
-import { adminCitasService } from "@/src/services/adminCitasService";
-
+import { Appointment } from "@/src/services/doctorCitasService";
+import {
+  getAllAppointments,
+  getAppointmentByDoctor,
+} from "@/src/services/citasService";
 
 const LOCAL_STORAGE_KEY = "appointments";
 
@@ -25,10 +27,12 @@ async function getPatientNameById(patientId: string): Promise<string> {
   }
 }
 
-export default function CitasPage({role}: { role: "doctor" | "admin" }) {
+export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   const [isCitasModalOpen, setIsCitasModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | undefined>(undefined);
+  const [selectedAppointment, setSelectedAppointment] = useState<
+    Appointment | undefined
+  >(undefined);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   const updateAppointment = async (appointment: Appointment) => {
@@ -36,14 +40,17 @@ export default function CitasPage({role}: { role: "doctor" | "admin" }) {
     const accessToken = localStorage.getItem("accessToken");
 
     try {
-      const response = await fetch(`http://localhost:8000/appointments/${appointmentId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(appointment),
-      });
+      const response = await fetch(
+        `http://localhost:8000/appointments/${appointmentId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(appointment),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Error al actualizar la cita");
@@ -60,26 +67,25 @@ export default function CitasPage({role}: { role: "doctor" | "admin" }) {
   useEffect(() => {
     const fetchAppointments = async () => {
       try {
-        const doctorId = "67460503e19d28f60d72c4c3"; // Replace with dynamic doctor ID
-
         let fetchedAppointments;
-        if (role==="doctor"){
-          fetchedAppointments = await doctorCitasService(doctorId);
-        }else{
-          fetchedAppointments = await adminCitasService(doctorId);
+        if (role === "doctor") {
+          fetchedAppointments = await getAppointmentByDoctor();
+        } else {
+          fetchedAppointments = await getAllAppointments();
         }
-        
 
         // Transform appointments
         const transformedAppointments = await Promise.all(
           fetchedAppointments.map(async (appointment) => {
-
             const formattedDate = new Date(appointment.date);
-            const formattedDateString = formattedDate.toLocaleDateString("es-ES", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-            });
+            const formattedDateString = formattedDate.toLocaleDateString(
+              "es-ES",
+              {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }
+            );
 
             const normalizeTime = (time: string): string => {
               const hasAmPm = /[APap][Mm]$/.test(time);
@@ -116,7 +122,7 @@ export default function CitasPage({role}: { role: "doctor" | "admin" }) {
 
             return {
               ...appointment,
-              name: 'Lenin Gael',
+              name: "Lenin Gael",
               date: formattedDateString,
               time: normalizeTime(appointment.time),
               type: translateType(appointment.date_type),
@@ -150,13 +156,17 @@ export default function CitasPage({role}: { role: "doctor" | "admin" }) {
   };
 
   const handleDeleteAppointment = (appointment: Appointment) => {
-    setAppointments((prev) => prev.filter((appt) => appt.record !== appointment.record));
+    setAppointments((prev) =>
+      prev.filter((appt) => appt.record !== appointment.record)
+    );
     setIsDeleteModalOpen(true);
   };
 
   const handleSaveAppointment = (editedAppointment: Appointment) => {
     setAppointments((prev) => {
-      const index = prev.findIndex((appt) => appt.record === editedAppointment.record);
+      const index = prev.findIndex(
+        (appt) => appt.record === editedAppointment.record
+      );
       if (index !== -1) {
         const updated = [...prev];
         updated[index] = editedAppointment;
