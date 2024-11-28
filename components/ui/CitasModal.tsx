@@ -128,8 +128,9 @@ export default function CitasModal({
                 value={formData.type}
                 onChange={handleChange}
               >
-                <option value="Nuevo paciente">Nuevo paciente</option>
-                <option value="Seguimiento">Seguimiento</option>
+                <option value="Consultation">Nuevo paciente</option>
+                <option value="virtual">Virtual</option>
+                <option value="presencial">Presencial</option>
               </select>
             </div>
             <div className="space-y-1 flex-1">
@@ -147,7 +148,7 @@ export default function CitasModal({
                 onChange={handleChange}
               >
                 <option value="Confirmada">Confirmada</option>
-                <option value="Cancelada">Cancelada</option>
+                <option value="Pendiente">Pendiente</option>
               </select>
             </div>
           </div>

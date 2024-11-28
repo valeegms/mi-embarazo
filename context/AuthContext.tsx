@@ -2,9 +2,9 @@
 
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
-import { loginService } from "@/services/loginService";
-import { fetchProfile } from "@/services/perfilService";
-import { UserModel } from "@/models/UserModel";
+import { loginService } from "@/src/services/loginService";
+import { fetchProfile } from "@/src/services/perfilService";
+import { UserModel } from "@/src/models/UserModel";
 
 interface AuthContextProps {
   user: UserModel | null; // User data
@@ -53,7 +53,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userResponse.phone,
         userResponse.role
       );
-
       setUser(user);
       localStorage.setItem("user_info", JSON.stringify(user));
     } catch (error) {

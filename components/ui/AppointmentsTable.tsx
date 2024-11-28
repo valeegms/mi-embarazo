@@ -10,20 +10,17 @@ import {
 import Badge from "./Badge";
 import { DeleteRounded, Edit } from "@mui/icons-material";
 
-type Appointment = {
-  name: string;
-  record: string;
-  date: string;
-  time: string;
-  type: string;
-  status: string;
+import { Appointment as BaseAppointment} from "@/src/services/doctorCitasService";
+
+type Appointment = BaseAppointment & {
+  additionalProperty?: string; // Agrega las propiedades necesarias
 };
 
 type AppointmentsTableProps = {
   appointments: Appointment[];
   onEdit: (appointment: Appointment) => void;
   onDelete: (appointment: Appointment) => void;
-  role: "doctor" | "admin";
+  role: "doctor" | "admin"; // Agrega esta línea
 };
 
 const getTypeChipColor = (
@@ -32,7 +29,7 @@ const getTypeChipColor = (
   switch (type) {
     case "Nuevo paciente":
       return { color: "warning" };
-    case "Seguimiento":
+    case "Virtual":
       return { color: "secondary" };
     default:
       return { color: "primary" };
@@ -45,7 +42,7 @@ const getStatusChipColor = (
   switch (status) {
     case "Confirmada":
       return { color: "success" };
-    case "Cancelada":
+    case "Pendiente":
       return { color: "danger" };
     default:
       return { color: "primary" };
@@ -56,7 +53,7 @@ export default function AppointmentsTable({
   appointments,
   onEdit,
   onDelete,
-  role,
+  role, // Added "role" prop to function arguments
 }: AppointmentsTableProps) {
   return (
     <TableContainer component={Paper} className="pt-6">
@@ -90,10 +87,10 @@ export default function AppointmentsTable({
               <TableCell>{appointment.name}</TableCell>
               <TableCell>{appointment.record}</TableCell>
               <TableCell>{appointment.date}</TableCell>
-              <TableCell>{appointment.time}</TableCell>
+              <TableCell>{appointment.time + " A.M."}</TableCell>
               <TableCell>
-                <Badge type={getTypeChipColor(appointment.type).color}>
-                  {appointment.type}
+                <Badge type={getTypeChipColor(appointment.date_type).color}>
+                  {appointment.date_type}
                 </Badge>
               </TableCell>
               <TableCell>
@@ -109,7 +106,7 @@ export default function AppointmentsTable({
                   >
                     <Edit />
                   </button>
-                  {role == "admin" && (
+                  {role === "admin" && ( // Conditional rendering for "Delete" button
                     <button
                       className="bg-red-100 px-2 py-1 rounded text-red-800 hover:bg-red-600 hover:bg-opacity-25"
                       onClick={() => onDelete(appointment)}

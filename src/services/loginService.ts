@@ -27,6 +27,9 @@ export const loginService = async (email: string, password: string): Promise<Log
 
     const data = await handleResponse<LoginResponse>(response);
 
+    // Store access token in local storage
+    localStorage.setItem('access_token', data.access_token);
+
     // Store access token in cookies
     setCookie('access_token', data.access_token, {
       secure: process.env.NODE_ENV === 'production',
