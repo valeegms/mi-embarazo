@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Avatar from "./ui/Avatar";
 import Input from "./ui/Input";
-import { updateProfile, verifyPassword } from "@/services/perfilService";
+import { updateProfile, verifyPassword } from "@/src/services/perfilService";
 
 export default function ProfilePage({ role }: { role: string }) {
   const [isEditing, setIsEditing] = useState(false); // Toggle editing

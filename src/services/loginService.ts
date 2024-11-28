@@ -5,9 +5,9 @@ export interface LoginResponse {
   access_token: string;
   user_email: string;
   user_id: string;
-  user_last_name: string;
+  user_phone: string;
   user_name: string;
-  user_profile_image: string;
+  role: string;
 }
 
 export interface LoginError {

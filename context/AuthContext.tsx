@@ -3,7 +3,6 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import { loginService } from "@/src/services/loginService";
-import { fetchProfile } from "@/src/services/perfilService";
 import { UserModel } from "@/src/models/UserModel";
 
 interface AuthContextProps {
@@ -11,7 +10,6 @@ interface AuthContextProps {
   accessToken: string | null; // Access token
   login: (email: string, password: string) => Promise<void>; // Login method
   logout: () => void; // Logout method
-  fetchUserProfile: () => Promise<void>; // Method to fetch the user profile
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -34,45 +32,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Function to fetch the user profile
-  const fetchUserProfile = async () => {
-    try {
-      const profileResponse = await fetchProfile();
-      const userResponse = profileResponse as {
-        _id: string;
-        name: string;
-        email: string;
-        phone: string;
-        role: string;
-      };
-
-      const user = new UserModel(
-        userResponse._id,
-        userResponse.name,
-        userResponse.email,
-        userResponse.phone,
-        userResponse.role
-      );
-
-      setUser(user);
-      localStorage.setItem("user_info", JSON.stringify(user));
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-    }
-  };
-
   // Function to handle login
   const login = async (email: string, password: string) => {
     try {
       const loginResponse = await loginService(email, password);
+
+      const user = new UserModel(
+        loginResponse.user_id,
+        loginResponse.user_name,
+        loginResponse.user_email,
+        loginResponse.user_phone,
+        loginResponse.role
+      );
       const token = loginResponse.access_token;
 
       localStorage.setItem("accessToken", token);
       setAccessToken(token);
 
+      setUser(user);
+      localStorage.setItem("user_info", JSON.stringify(user));
+
       // Redirect based on role
       const redirectRoute =
-        user?.role === "admin" ? "/admin/dashboard" : "/doctor/dashboard";
+        loginResponse.role === "admin"
+          ? "/admin/dashboard"
+          : "/doctor/dashboard";
       router.push(redirectRoute);
     } catch (error) {
       console.error("Error during login:", error);
@@ -90,9 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, accessToken, login, logout, fetchUserProfile }}
-    >
+    <AuthContext.Provider value={{ user, accessToken, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
