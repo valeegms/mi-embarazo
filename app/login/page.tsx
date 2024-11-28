@@ -11,6 +11,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
+  const { fetchUserProfile } = useAuth();
 
   // Regular expression for validating email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -44,6 +45,19 @@ export default function LoginPage() {
       } else {
         setError("Ocurrió un error inesperado.");
       }
+    } finally {
+      setIsLoading(false);
+    }
+
+    try {
+      setIsLoading(true);
+      await fetchUserProfile();
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+
+      setError(
+        "Ocurrió un error al cargar tu perfil. Por favor, intenta de nuevo."
+      );
     } finally {
       setIsLoading(false);
     }
