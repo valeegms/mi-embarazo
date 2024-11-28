@@ -11,6 +11,7 @@ interface AuthContextProps {
   accessToken: string | null; // Access token
   login: (email: string, password: string) => Promise<void>; // Login method
   logout: () => void; // Logout method
+  fetchUserProfile: () => Promise<void>; // Method to fetch the user profile
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -33,16 +34,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   }, []);
 
-  // Function to handle login
-  const login = async (email: string, password: string) => {
+  // Function to fetch the user profile
+  const fetchUserProfile = async () => {
     try {
-      // Step 1: Login and get access token
-      const loginResponse = await loginService(email, password);
-      const token = loginResponse.access_token;
-
-      
-
-      // Step 2: Fetch user profile using the token
       const profileResponse = await fetchProfile();
       const userResponse = profileResponse as {
         _id: string;
@@ -59,21 +53,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userResponse.phone,
         userResponse.role
       );
-
-
-      // Step 3: Store data in localStorage and update context
-      localStorage.setItem("accessToken", token);
-      localStorage.setItem("user_info", JSON.stringify(user));
-      setAccessToken(token);
       setUser(user);
+      localStorage.setItem("user_info", JSON.stringify(user));
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    }
+  };
 
-      // Step 4: Redirect based on role
+  // Function to handle login
+  const login = async (email: string, password: string) => {
+    try {
+      const loginResponse = await loginService(email, password);
+      const token = loginResponse.access_token;
+
+      localStorage.setItem("accessToken", token);
+      setAccessToken(token);
+
+      await fetchUserProfile(); // Fetch user profile after successful login
+
+      // Redirect based on role
       const redirectRoute =
-        user.role === "admin" ? "/admin/dashboard" : "/doctor/dashboard";
+        user?.role === "admin" ? "/admin/dashboard" : "/doctor/dashboard";
       router.push(redirectRoute);
     } catch (error) {
       console.error("Error during login:", error);
-      throw error; // Throw error to handle in the LoginPage
+      throw error;
     }
   };
 
@@ -83,11 +87,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("user_info");
     setAccessToken(null);
     setUser(null);
-    router.push("/login"); // Redirect to login page
+    router.push("/login");
   };
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, accessToken, login, logout, fetchUserProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );
