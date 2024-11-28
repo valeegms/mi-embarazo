@@ -48,7 +48,7 @@ const initialFormData = {
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState(appointmentsArray);
   const [formData, setFormData] = useState(initialFormData);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(true);
 
   const handleEditClick = () => setIsEditing((prev) => !prev);
 
@@ -73,7 +73,10 @@ export default function DashboardPage() {
 
   return (
     <main>
-      <h1 className="text-3xl font-bold">Bienvenido/a {username},</h1>
+      <h1 className="text-3xl font-bold">
+        Bienvenido/a{" "}
+        {JSON.parse(localStorage.getItem("user_info") || "{}").name},
+      </h1>
       <p className="text-gray-400 font-light pt-1">
         Revisa la información general sobre el paciente y las próximas citas.
       </p>

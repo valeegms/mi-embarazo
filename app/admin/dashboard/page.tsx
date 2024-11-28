@@ -32,7 +32,10 @@ export default function DashboardPage() {
 
   return (
     <main>
-      <h1 className="text-3xl font-bold">Bienvenido/a,</h1>
+      <h1 className="text-3xl font-bold">
+        Bienvenido/a{" "}
+        {JSON.parse(localStorage.getItem("user_info") || "{}").name},
+      </h1>
       <p className="text-gray-400 font-light pt-1">
         Revisa la información general sobre el paciente y las próximas citas.
       </p>
