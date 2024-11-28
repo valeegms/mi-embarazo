@@ -1,7 +1,7 @@
 import { Modal } from "@mui/material";
 import Input from "./Input";
 import { useEffect, useState } from "react";
-import { DoctorModel } from "@/models/DoctorModel";
+import { DoctorModel } from "@/src/models/DoctorModel";
 
 export default function DoctorsModal({
   isOpen,

@@ -1,4 +1,4 @@
-import { DoctorModel } from "@/models/DoctorModel";
+import { DoctorModel } from "../models/DoctorModel";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 

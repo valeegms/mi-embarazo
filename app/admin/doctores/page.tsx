@@ -6,13 +6,12 @@ import DoctorsModal from "../../../components/ui/DoctorsModal";
 import DeleteModalDoctor from "../../../components/ui/DeleteModalDoctor";
 import Input from "../../../components/ui/Input";
 import {
-  fetchDoctors,
   addDoctor,
-  updateDoctor,
   deleteDoctor,
-} from "@/services/adminDoctoresService";
-import { DoctorModel } from "@/models/DoctorModel"; 
-
+  fetchDoctors,
+  updateDoctor,
+} from "@/src/services/adminDoctoresService";
+import { DoctorModel } from "@/src/models/DoctorModel";
 
 export default function DoctoresPage() {
   const [doctors, setDoctors] = useState<DoctorModel[]>([]);
@@ -21,7 +20,9 @@ export default function DoctoresPage() {
   const [loading, setLoading] = useState(true);
   const [isDoctorsModalOpen, setIsDoctorsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [doctorToDelete, setDoctorToDelete] = useState<DoctorModel | null>(null);
+  const [doctorToDelete, setDoctorToDelete] = useState<DoctorModel | null>(
+    null
+  );
   const [doctor, setDoctor] = useState<DoctorModel | undefined>(undefined);
 
   useEffect(() => {
@@ -61,15 +62,19 @@ export default function DoctoresPage() {
         // Si el doctor ya existe, lo actualizamos
         const updatedDoctor = await updateDoctor(newDoctor.id, newDoctor);
         setDoctors((prevDoctors) =>
-          prevDoctors.map((doc) => (doc.id === newDoctor.id ? updatedDoctor : doc))
+          prevDoctors.map((doc) =>
+            doc.id === newDoctor.id ? updatedDoctor : doc
+          )
         );
         setFilteredDoctors((prevFiltered) =>
-          prevFiltered.map((doc) => (doc.id === newDoctor.id ? updatedDoctor : doc))
+          prevFiltered.map((doc) =>
+            doc.id === newDoctor.id ? updatedDoctor : doc
+          )
         );
       } else {
         // Si es un nuevo doctor, lo añadimos
         const createdDoctor = await addDoctor(newDoctor);
-  
+
         setDoctors((prevDoctors) => [...prevDoctors, createdDoctor]); // Actualizamos la lista completa
         setFilteredDoctors((prevFiltered) => [...prevFiltered, createdDoctor]); // Actualizamos la lista filtrada
       }
@@ -79,7 +84,6 @@ export default function DoctoresPage() {
       setIsDoctorsModalOpen(false); // Cerramos el modal
     }
   };
-  
 
   const openDeleteModal = (doctor: DoctorModel) => {
     setDoctorToDelete(doctor);
@@ -144,7 +148,6 @@ export default function DoctoresPage() {
         message={`¿Estás seguro que deseas eliminar a ${doctorToDelete?.name}? Esta acción no se puede deshacer.`}
         onConfirm={confirmDeleteDoctor}
       />
-
 
       <DoctorsModal
         isOpen={isDoctorsModalOpen}
