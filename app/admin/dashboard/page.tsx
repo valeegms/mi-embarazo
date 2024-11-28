@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import CitasPage from "../../../components/CitasPage";
 import Card from "../../../components/ui/Card";
-import { fetchDashboardCounts } from "@/services/adminDashboardService";
+import { fetchDashboardCounts } from "@/src/services/adminDashboardService";
 import {
   CalendarTodayRounded,
   FaceRounded,

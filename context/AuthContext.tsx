@@ -53,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         userResponse.phone,
         userResponse.role
       );
+
       setUser(user);
       localStorage.setItem("user_info", JSON.stringify(user));
     } catch (error) {
@@ -68,8 +69,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       localStorage.setItem("accessToken", token);
       setAccessToken(token);
-
-      await fetchUserProfile(); // Fetch user profile after successful login
 
       // Redirect based on role
       const redirectRoute =

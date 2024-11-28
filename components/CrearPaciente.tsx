@@ -3,7 +3,6 @@
 import { Tab, Tabs, Button } from "@mui/material";
 import React, { useState } from "react";
 import DetailsTab from "./ui/PatientRecordTabs/DetailsTab";
-import MedicalHistoryTab from "./ui/PatientRecordTabs/MedicalHistoryTab";
 import ControlPrenatalTab from "./ui/PatientRecordTabs/ControlPrenatalTab";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -127,7 +126,6 @@ export default function CrearPaciente() {
       >
         <Tab value={0} label="Detalles" />
         <Tab value={1} label="Historial" />
-        <Tab value={2} label="Control prenatal" />
       </Tabs>
       <DetailsTab
         value={tab}
@@ -145,16 +143,10 @@ export default function CrearPaciente() {
           }));
         }}
       />
-      <MedicalHistoryTab
-        value={tab}
-        index={1}
-        isEditing
-        formData={formData.medicalHistory}
-        updateData={(data) => updateFormData("medicalHistory", data)}
-      />
+
       <ControlPrenatalTab
         value={tab}
-        index={2}
+        index={1}
         isEditing
         formData={formData.prenatalControl[0]}
         updateData={(data) => updateFormData("prenatalControl", [data])}
