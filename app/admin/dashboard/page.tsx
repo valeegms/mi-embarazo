@@ -9,10 +9,8 @@ import {
   FaceRounded,
   GroupRounded,
 } from "@mui/icons-material";
-import { Skeleton } from "@mui/material";
 
 export default function DashboardPage() {
-  const [isLoadingCounts, setIsLoadingCounts] = useState(true);
   const [counts, setCounts] = useState({
     doctors: 0,
     patients: 0,
@@ -22,9 +20,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadCounts = async () => {
       try {
-        const data = await fetchDashboardCounts().finally(() =>
-          setIsLoadingCounts(false)
-        );
+        const data = await fetchDashboardCounts();
         setCounts(data);
       } catch (error) {
         console.error("Error fetching dashboard counts:", error);
@@ -44,51 +40,39 @@ export default function DashboardPage() {
         Revisa la información general sobre el paciente y las próximas citas.
       </p>
       <section className="flex gap-4 my-6">
-        {isLoadingCounts ? (
-          <>
-            <Skeleton variant="rounded" width={400} height={300} />
-            <Skeleton variant="rounded" width={400} height={300} />
-            <Skeleton variant="rounded" width={400} height={300} />
-          </>
-        ) : (
-          <>
-            <Card className="flex-1 py-10">
-              <div className="flex justify-between items-center">
-                <div>
-                  <small className="font-semibold">Doctores</small>
-                  <h2 className="text-5xl font-bold text-black">
-                    {counts.doctors}
-                  </h2>
-                </div>
-                <FaceRounded className="text-[--primary-color] text-6xl" />
-              </div>
-            </Card>
-            <>
-              <Card className="flex-1 py-10">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <small className="font-semibold">Pacientes</small>
-                    <h2 className="text-5xl font-bold text-black">
-                      {counts.patients}
-                    </h2>
-                  </div>
-                  <GroupRounded className="text-[--primary-color] text-6xl" />
-                </div>
-              </Card>
-              <Card className="flex-1 py-10">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <small className="font-semibold">Citas</small>
-                    <h2 className="text-5xl font-bold text-black">
-                      {counts.appointments}
-                    </h2>
-                  </div>
-                  <CalendarTodayRounded className="text-[--primary-color] text-6xl" />
-                </div>
-              </Card>
-            </>
-          </>
-        )}
+        <Card className="flex-1 py-10">
+          <div className="flex justify-between items-center">
+            <div>
+              <small className="font-semibold">Doctores</small>
+              <h2 className="text-5xl font-bold text-black">
+                {counts.doctors}
+              </h2>
+            </div>
+            <FaceRounded className="text-[--primary-color] text-6xl" />
+          </div>
+        </Card>
+        <Card className="flex-1 py-10">
+          <div className="flex justify-between items-center">
+            <div>
+              <small className="font-semibold">Pacientes</small>
+              <h2 className="text-5xl font-bold text-black">
+                {counts.patients}
+              </h2>
+            </div>
+            <GroupRounded className="text-[--primary-color] text-6xl" />
+          </div>
+        </Card>
+        <Card className="flex-1 py-10">
+          <div className="flex justify-between items-center">
+            <div>
+              <small className="font-semibold">Citas</small>
+              <h2 className="text-5xl font-bold text-black">
+                {counts.appointments}
+              </h2>
+            </div>
+            <CalendarTodayRounded className="text-[--primary-color] text-6xl" />
+          </div>
+        </Card>
       </section>
       {/* Reutilizamos CitasPage */}
       <CitasPage role="admin" />
