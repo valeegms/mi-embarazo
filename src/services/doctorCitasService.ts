@@ -7,7 +7,7 @@ export type Appointment = {
   time: string;
   date_type: string;
   status: string;
-  patient: string;  // Propiedad "patient" obligatoria
+  patient: string;  // id del paciente
 };
 
 
