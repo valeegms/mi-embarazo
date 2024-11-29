@@ -50,9 +50,9 @@ export default function Navbar({ role }: { role: string }) {
             </Link>
             {role === "admin" && (
               <Link
-                href={`/${role}/doctores`}
+                href={`/admin/doctores`}
                 className={`${
-                  pathname === `/${role}/doctores`
+                  pathname === `/admin/doctores`
                     ? "text-[--primary-color] font-bold"
                     : "text-gray-400 hover:text-gray-500"
                 } flex gap-x-1`}
