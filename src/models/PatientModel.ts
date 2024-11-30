@@ -1,5 +1,5 @@
 export class PatientModel {
-    id: string;
+    _id?: string;
     record: string;
     name: string;
     personalData: PersonalData;
@@ -10,21 +10,25 @@ export class PatientModel {
     date: string;
     pregnancyData: PregnancyData;
     medicalHistory: MedicalHistory;
+    last_appointment?: string;
+    last_appointment_id?: string;
 
     constructor(
-        id: string = '',
+        _id: string = '',
         record: string = '',
         name: string = '',
-        personalData: PersonalData = new PersonalData('','','',0,'','','','','',{},'','','','',''),
+        personalData: PersonalData = new PersonalData('','','',0,'','','','','','','','','','',''),
         current_phone: string = '',
         doctor_options: unknown[] = [],
         schedule_options: unknown[] = [],
         doctor: string = '',
         date: string = '',
         pregnancyData: PregnancyData = new PregnancyData('','','',0,0,'','',''),
-        medicalHistory: MedicalHistory = new MedicalHistory('','','','')
+        medicalHistory: MedicalHistory = new MedicalHistory('','','',''),
+        last_appointment: string = '',
+        last_appointment_id: string = ''
     ) {
-        this.id = id;
+        this._id = _id;
         this.record = record;
         this.name = name;
         this.personalData = personalData;
@@ -35,6 +39,8 @@ export class PatientModel {
         this.date = date;
         this.pregnancyData = pregnancyData;
         this.medicalHistory = medicalHistory;
+        this.last_appointment = last_appointment;
+        this.last_appointment_id = last_appointment_id;
     }
 }
 
@@ -49,7 +55,7 @@ export class PersonalData {
     curp: string;
     maritalStatus: string;
     occupation: string;
-    address: object;
+    address: string;
     street: string;
     municipality: string;
     locality: string;
@@ -65,7 +71,7 @@ export class PersonalData {
         password: string,
         curp: string,
         occupation: string,
-        address: object,
+        address: string,
         maritalStatus: string,
         street: string,
         municipality: string,

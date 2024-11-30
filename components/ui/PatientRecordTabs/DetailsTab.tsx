@@ -6,13 +6,13 @@ import { PatientModel } from "@/src/models/PatientModel";
 export interface TabPanelProps {
   index: number;
   value: number;
-  formData: PatientModel;
+  formData: any;
   updateData: any;
   isEditing?: boolean;
 }
 
 export default function DetailsTab(props: TabPanelProps) {
-  const { formData, updateData, isEditing, value, index, ...other } = props;
+  const { updateData, formData, isEditing, value, index, ...other } = props;
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -41,7 +41,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData?.name}
+                value={formData?.personalData.name}
               />
               <Input
                 name="maritalStatus"
@@ -76,13 +76,13 @@ export default function DetailsTab(props: TabPanelProps) {
                 value={formData?.personalData?.phone}
               />
               <Input
-                name="street"
+                name="address"
                 label="Dirección"
                 type="text"
                 disabled={!isEditing}
                 className="row-span-2"
                 onChange={handleChange}
-                value={formData?.personalData?.address?.street}
+                value={formData?.personalData?.address}
               />
               <Input
                 name="age"
@@ -106,7 +106,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData?.personalData?.address?.municipality}
+                value={formData?.personalData?.municipality}
               />
               <Input
                 name="locality"
@@ -114,7 +114,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData?.personalData?.address?.locality}
+                value={formData?.personalData?.locality}
               />
               <Input
                 name="state"
@@ -122,7 +122,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData?.personalData?.address?.state}
+                value={formData?.personalData?.state}
               />
               <Input
                 name="email"
@@ -194,7 +194,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 onChange={handleChange}
               />
               <TextField
-                name="complications"
+                name="complication"
                 label="Complicaciones"
                 className="col-span-2"
                 disabled={!isEditing}

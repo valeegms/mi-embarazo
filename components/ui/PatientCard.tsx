@@ -15,13 +15,16 @@ export default function PatientCard({
   role: string;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const handleRowClick = (record: string) => {
-    window.open(`/${role}/pacientes/${record}`, "_blank");
+
+  const handleRowClick = (patient: PatientModel) => {
+    // window.open(`/${role}/pacientes/${patientId}`, "_blank");
+    console.log("Opening patient record: ", patient);
+    window.open(`/${role}/pacientes/${patient._id}`, "_blank");
   };
 
-  const handleDelete = (record: string) => {
+  const handleDelete = (patientId: string) => {
     // TODO: Implement delete patient
-    console.log("Deleting patient with record: ", record);
+    console.log("Deleting patient with record: ", patientId);
     setIsModalOpen(true);
   };
 
@@ -33,7 +36,7 @@ export default function PatientCard({
           <h3 className="font-bold">{patient.personalData.name}</h3>
           <p className="text-sm text-gray-400">
             {patient.personalData.age} años |{" "}
-            {patient.pregnancyData.gestationStage} meses de embarazo
+            {patient.pregnancyData.gestationStage} semanas de embarazo
           </p>
         </div>
       </section>
@@ -42,14 +45,14 @@ export default function PatientCard({
         {role == "admin" && (
           <button
             className="text-red-600 font-bold hover:text-red-800"
-            onClick={() => handleDelete(patient.record)}
+            onClick={() => handleDelete(patient._id!)}
           >
             <DeleteRounded />
           </button>
         )}
         <button
           className="text-[--primary-color] font-bold hover:text-[--primary-color-dark]"
-          onClick={() => handleRowClick(patient.record)}
+          onClick={() => handleRowClick(patient)}
         >
           <OpenInNewRounded />
         </button>

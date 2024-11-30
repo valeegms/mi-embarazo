@@ -20,8 +20,32 @@ export async function getAllAppointments(): Promise<AppointmentModel[]> {
 
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
     const appointments: AppointmentModel[] = await response.json();
+    
     console.log("Lista de citas:", appointments);
-    return appointments;
+    return appointments.filter((appointment) => appointment.record !== null);;
+  } catch (error) {
+    console.error("Error al obtener citas:", error);
+    throw error; // Relanza el error para manejo adicional
+  }
+}
+
+export async function getAppointmentByPatient(id: string): Promise<any> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/appointments/patients/${id}`, {
+      method: "GET",
+      headers: getHeaders(),
+    });
+
+    // Verifica si la respuesta es exitosa
+    if (!response.ok) {
+      const error: AppointmentsError = await response.json();
+      throw new Error(error.detail || "Failed to fetch appointments");
+    }
+
+    // Convierte la respuesta a JSON y la retorna como un arreglo de citas
+    const appointment: any = await response.json();
+    console.log("Cita:", appointment);
+    return appointment;
   } catch (error) {
     console.error("Error al obtener citas:", error);
     throw error; // Relanza el error para manejo adicional
@@ -54,7 +78,7 @@ export async function getAppointmentByDoctor(status?: string): Promise<Appointme
   }
 }
 
-export async function saveAppointmentDetails(appointment: AppointmentDetailsModel) {
+export async function createAppointment(appointment: AppointmentDetailsModel) {
   try {
     const response = await fetch(`${API_BASE_URL}/appointments`, {
       method: "POST",
@@ -92,9 +116,10 @@ export async function saveAppointmentId(patientId: unknown, appointment_id: unkn
   }
 }
 
-export async function updateAppointmentDetails(id: string, appointment: AppointmentDetailsModel) {
+export async function updateAppointmentDetails(appointment: AppointmentModel | AppointmentDetailsModel) {
   try {
-    const response = await fetch(`${API_BASE_URL}/appointments/${id}`, {
+    console.log("Updating appointment:", appointment);
+    const response = await fetch(`${API_BASE_URL}/appointments/${appointment._id}`, {
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(appointment),

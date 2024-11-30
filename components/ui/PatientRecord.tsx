@@ -1,52 +1,85 @@
 "use client";
 
-import { Button, Skeleton, Tab, Tabs } from "@mui/material";
+import { Button, LinearProgress, Tab, Tabs } from "@mui/material";
 import DetailsTab from "./PatientRecordTabs/DetailsTab"; // Now includes both details and medical history
 import ControlPrenatalTab from "./PatientRecordTabs/ControlPrenatalTab";
 import { useEffect, useState } from "react";
 import { PatientModel } from "@/src/models/PatientModel";
 import { savePatientDetails } from "@/src/services/pacienteService";
+import { AppointmentDetailsModel } from "@/src/models/AppointmentModel";
 
-export default function PatientRecord({ patient }: { patient: PatientModel }) {
+export default function PatientRecord({
+  patient,
+  appointmentDetails,
+}: {
+  patient: PatientModel;
+  appointmentDetails: AppointmentDetailsModel;
+}) {
   const [tab, setTab] = useState(0);
   const [formData, setFormData] = useState<PatientModel>(new PatientModel());
-  const [isLoading, setIsLoading] = useState(true);
+  const [controlPrenatalformData, setcontrolPrenatalFormData] =
+    useState<AppointmentDetailsModel>({});
+  const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
+  const updateData = (data: PatientModel) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      personalData: { ...prevData.personalData, ...data },
+      pregnancyData: { ...prevData.pregnancyData, ...data },
+      medicalHistory: { ...prevData.medicalHistory, ...data },
+    }));
+  };
+
+  const updateControlPrenatalData = (data: AppointmentDetailsModel) => {
+    setcontrolPrenatalFormData((prevData) => ({
+      ...prevData,
+      ...data,
+    }));
+  };
+
+  const detailsTabProps = {
+    isEditing,
+    formData,
+    updateData,
+  };
+
+  const controlPrenatalProps = {
+    isEditing,
+    formData: controlPrenatalformData,
+    updateData: updateControlPrenatalData,
+  };
+
+  const tabs = [
+    {
+      label: "Detalles",
+      component: <DetailsTab value={tab} index={0} {...detailsTabProps} />,
+    },
+    {
+      label: "Control prenatal",
+      component: (
+        <ControlPrenatalTab value={tab} index={1} {...controlPrenatalProps} />
+      ),
+    },
+  ];
+
+  // useEffect to set the patient data to the form data
   useEffect(() => {
     if (patient) {
+      setcontrolPrenatalFormData(appointmentDetails);
       setFormData(patient);
-      console.log("Patient data:", formData);
       setIsLoading(false);
     } else {
       setIsLoading(true);
     }
   }, [patient]);
 
-  const commonProps = {
-    isEditing,
-    formData,
-    updateData: (patient: PatientModel) =>
-      setFormData({ ...formData, ...patient }),
-  };
-
-  const tabs = [
-    {
-      label: "Detalles",
-      component: <DetailsTab value={tab} index={0} {...commonProps} />,
-    },
-    {
-      label: "Control prenatal",
-      component: <ControlPrenatalTab value={tab} index={1} {...commonProps} />,
-    },
-  ];
-
   const handleSaveButton = async () => {
     if (isEditing) {
       try {
         setIsLoading(true);
 
-        await savePatientDetails(formData!.id, formData!);
+        await savePatientDetails(formData._id!, formData!);
       } catch (error) {
         console.error("Error saving patient details:", error);
       } finally {
@@ -85,7 +118,15 @@ export default function PatientRecord({ patient }: { patient: PatientModel }) {
             tab === index && <div key={index}>{tabItem.component}</div>
         )
       ) : (
-        <Skeleton variant="rectangular" height={400} />
+        <LinearProgress
+          color="secondary"
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+          }}
+        />
       )}
     </div>
   );

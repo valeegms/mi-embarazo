@@ -42,7 +42,7 @@ export default function Input({
             disabled
               ? "bg-gray-100 text-gray-500 cursor-not-allowed"
               : "bg-white text-black"
-          } border py-2 px-2 rounded-md font-medium focus:outline-none focus:ring-2 focus:ring-[--primary-color] w-full ${
+          } border py-2 px-2 rounded-md font-medium focus:outline-none focus:ring-1 focus:ring-[--primary-color] w-full ${
             type === "search" ? "pl-10" : ""
           } ${error ? "border-red-500" : "border-gray-300"}`}
         />

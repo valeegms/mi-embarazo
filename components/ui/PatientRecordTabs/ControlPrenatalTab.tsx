@@ -1,9 +1,11 @@
+"use client";
+
 import Card from "../Card";
 import ControlPrenatalForm from "../../ControlPrenatalFrom";
 import { TabPanelProps } from "./DetailsTab";
 
 export default function ControlPrenatalTab(props: TabPanelProps) {
-  const { formData, updateData, isEditing, value, index, ...other } = props;
+  const { value, index, formData, updateData, isEditing } = props;
 
   return (
     <div
@@ -12,7 +14,6 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
       hidden={value !== index}
       id={`simple-tabpanel-${index}`}
       aria-labelledby={`simple-tab-${index}`}
-      {...other}
     >
       {value === index && (
         <Card>

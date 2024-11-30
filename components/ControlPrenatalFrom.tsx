@@ -2,6 +2,7 @@ import React from "react";
 import Input from "./ui/Input";
 import TextField from "./ui/TextField";
 import { AppointmentDetailsModel } from "@/src/models/AppointmentModel";
+import { PregnancyData } from "@/src/models/PatientModel";
 
 interface ControlPrenatalFormProps {
   formData: AppointmentDetailsModel;

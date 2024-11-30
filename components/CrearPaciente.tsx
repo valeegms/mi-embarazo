@@ -3,100 +3,34 @@
 import { Tab, Tabs, Button } from "@mui/material";
 import React, { useState } from "react";
 import DetailsTab from "./ui/PatientRecordTabs/DetailsTab";
-import ControlPrenatalTab from "./ui/PatientRecordTabs/ControlPrenatalTab";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { createPatient } from "@/src/services/pacienteService";
+import { PatientModel } from "@/src/models/PatientModel";
 
 export default function CrearPaciente() {
   const pathname = usePathname();
   const role = pathname.split("/")[1];
 
   const [tab, setTab] = useState(0);
-  const [formData, setFormData] = useState({
-    id: "",
-    record: "",
-    personalData: {
-      name: "",
-      gender: "",
-      phone: "",
-      age: null,
-      birthDate: "",
-      email: "",
-      curp: "",
-      maritalStatus: "",
-      occupation: "",
-      address: {
-        street: "",
-        municipality: "",
-        locality: "",
-        state: "",
-      },
-    },
-    pregnancyData: {
-      gestationStage: "",
-      dueDate: "",
-      previousPregnancies: null,
-      pregnancyType: "",
-      complications: "",
-      observations: "",
-    },
-    lastAppointment: {
-      date: "",
-      time: "",
-      weight: "",
-      bloodPressure: "",
-      fetalHeartRate: "",
-      fetalStatus: "",
-      prescription: "",
-      observations: "",
-    },
-    nextAppointment: {
-      date: "",
-      time: "",
-      appointmentType: "",
-      doctor: "",
-      appointmentStatus: "",
-    },
-    prenatalControl: [
-      {
-        date: "",
-        time: "",
-        weight: "",
-        bloodPressure: "",
-        fetalHeartRate: "",
-        fetalStatus: "",
-        prescription: "",
-        observations: "",
-      },
-    ],
-    medicalHistory: {
-      medicalConditions: "",
-      gynecologicalHistory: "",
-      allergies: "",
-      familyHistory: "",
-    },
-  });
-
-  const updateFormData = (section, updatedData) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      [section]: { ...prevData[section], ...updatedData },
-    }));
-  };
+  const [formData, setFormData] = useState<PatientModel>(new PatientModel());
 
   const savePatient = async () => {
     try {
-      const response = await fetch(`http://localhost:4000/patients`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-        .then((res) => res.json())
-        .then((data) => console.log(data));
+      formData.record = `EXP-${Math.floor(Math.random() * 1000000)}`;
 
-      //   if (!response.ok) throw new Error("Failed to save patient data");
+      if (role == "doctor") {
+        formData.doctor = JSON.parse(localStorage.getItem("user_info")!)
+          ._id as string;
+      }
 
-      // Provide feedback or navigate
+      const formDataWithoutId = { ...formData };
+      delete formDataWithoutId._id;
+      console.log(formDataWithoutId);
+
+      await createPatient(formDataWithoutId).finally(() => {
+        setFormData(new PatientModel()); // Clear form
+      });
     } catch (error) {
       console.error(error);
     }
@@ -125,17 +59,14 @@ export default function CrearPaciente() {
         onChange={(e, newValue) => setTab(newValue)}
       >
         <Tab value={0} label="Detalles" />
-        <Tab value={1} label="Historial" />
+        {/* <Tab value={1} label="Historial" /> */}
       </Tabs>
       <DetailsTab
         value={tab}
         index={0}
         isEditing
-        formData={{
-          personalData: formData.personalData,
-          pregnancyData: formData.pregnancyData,
-        }}
-        updateData={(data) => {
+        formData={formData}
+        updateData={(data: PatientModel) => {
           setFormData((prevData) => ({
             ...prevData,
             personalData: { ...prevData.personalData, ...data },
@@ -144,13 +75,13 @@ export default function CrearPaciente() {
         }}
       />
 
-      <ControlPrenatalTab
+      {/* <ControlPrenatalTab
         value={tab}
         index={1}
         isEditing
         formData={formData.prenatalControl[0]}
         updateData={(data) => updateFormData("prenatalControl", [data])}
-      />
+      /> */}
     </div>
   );
 }

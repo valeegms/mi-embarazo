@@ -1,41 +1,62 @@
 import { Modal } from "@mui/material";
 import Input from "./Input";
 import { useEffect, useState } from "react";
-import { Appointment } from "@/src/services/doctorCitasService";
+import { AppointmentModel } from "@/src/models/AppointmentModel";
+import { DateTime } from "luxon";
+import {
+  createAppointment,
+  updateAppointmentDetails,
+} from "@/src/services/citasService";
+import { PatientModel } from "@/src/models/PatientModel";
+
+const resetForm: AppointmentModel = new AppointmentModel(
+  "",
+  "",
+  "",
+  "",
+  JSON.parse(localStorage.getItem("user_info") || "{}")._id,
+  null!,
+  DateTime.now().toISODate(),
+  DateTime.now().toFormat("HH:mm"),
+  "Nuevo paciente",
+  "Confirmada",
+  0,
+  "",
+  "",
+  "",
+  "",
+  ""
+);
 
 export default function CitasModal({
   isOpen,
   onClose,
   appointment,
+  availablePatients,
+  setShouldRefetch,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  appointment?: Appointment;
+  appointment?: AppointmentModel;
+  availablePatients: PatientModel[];
+  setShouldRefetch: (shouldRefetch: boolean) => void;
 }) {
-  const [formData, setFormData] = useState<Appointment>({
-    patient_name: "",
-    record: "",
-    date: "",
-    time: "",
-    date_type: "",
-    status: "",
-    patient: "",
-  });
+  const [formData, setFormData] = useState<AppointmentModel>(resetForm);
 
   useEffect(() => {
     if (appointment) {
-      setFormData(appointment);
-    } else {
-      // Reset form for new appointments
-      setFormData({
-        patient_name: "",
-        record: "",
-        date: "",
-        time: "",
-        date_type: "",
-        status: "",
-        patient: "",
-      });
+      console.log("Appointment:", appointment); // Debugging
+      const formattedAppointment = {
+        ...appointment,
+        time: DateTime.fromFormat(appointment.time, "HH:mm").toFormat("HH:mm"),
+        date: DateTime.fromISO(appointment.date).toFormat("yyyy-MM-dd"),
+        status: appointment.status === "" ? "Confirmada" : appointment.status,
+        date_type:
+          appointment.date_type === ""
+            ? "Nuevo paciente"
+            : appointment.date_type,
+      };
+      setFormData(formattedAppointment);
     }
   }, [appointment]);
 
@@ -43,17 +64,64 @@ export default function CitasModal({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+
+    if (name === "patient") {
+      const selectedPatient = availablePatients.find(
+        (patient) => patient._id === value
+      );
+
+      if (selectedPatient) {
+        setFormData((prevData) => ({
+          ...prevData,
+          patient_name: selectedPatient.personalData.name,
+          record: selectedPatient.record,
+          patient: selectedPatient._id,
+        }));
+      }
+    } else {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
+  };
+
+  const saveNewAppointment = async (appointment: AppointmentModel) => {
+    try {
+      await createAppointment(appointment);
+    } catch (error) {
+      console.error("Error al realizar la solicitud POST:", error);
+    }
+  };
+
+  const updateAppointment = async (appointment: AppointmentModel) => {
+    try {
+      await updateAppointmentDetails(appointment);
+    } catch (error) {
+      console.error("Error al realizar la solicitud PUT:", error);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted Data: ", formData);
+    if (appointment !== undefined) {
+      updateAppointment(formData);
+    } else {
+      const formDataWithoutId = { ...formData };
+      delete formDataWithoutId._id;
+
+      saveNewAppointment(formDataWithoutId);
+      setFormData(resetForm);
+    }
+
+    onClose();
+    setShouldRefetch(true);
+  };
+
+  const handleCancel = () => {
+    if (!appointment) setFormData(resetForm);
     onClose();
   };
 
   return (
-    <Modal open={isOpen} onClose={onClose}>
+    <Modal open={isOpen}>
       <div className="bg-white p-8 w-[30rem] mx-auto mt-20 rounded-md">
         <h2 className="text-2xl font-bold">
           {appointment ? "Editar cita" : "Nueva cita"}
@@ -66,24 +134,26 @@ export default function CitasModal({
             Nombre
           </label>
           <select
-            id="paciente"
-            name="paciente"
-            className="p-2 border border-gray-200 rounded-md w-full"
+            id="patient"
+            name="patient"
+            className="p-2 border border-gray-200 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-[--primary-color]"
             onChange={handleChange}
-            value={appointment?.patient_name}
+            value={formData.patient as string}
             disabled={appointment !== undefined}
           >
             {appointment ? (
-              <option value={appointment.patient_name}>
+              <option value={appointment.patient as string}>
                 {appointment.patient_name}
               </option>
             ) : (
               <option value="">Seleccionar paciente</option>
             )}
-            <option value="María González">María González</option>
-            <option value="José Pérez">José Pérez</option>
-            <option value="Ana García">Ana García</option>
-            <option value="Carlos López">Carlos López</option>
+            {!appointment &&
+              availablePatients.map((patient) => (
+                <option key={patient._id} value={patient._id}>
+                  {patient.personalData.name}
+                </option>
+              ))}
           </select>
           <Input
             label="Expediente"
@@ -120,15 +190,24 @@ export default function CitasModal({
                 Tipo de cita
               </label>
               <select
-                id="type"
-                name="type"
-                className="p-2 border border-gray-200 rounded-md w-full"
-                value={formData.type}
+                id="date_type"
+                name="date_type"
+                className="p-2 border border-gray-200 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-[--primary-color]"
+                value={formData.date_type}
                 onChange={handleChange}
               >
-                <option value="Consultation">Nuevo paciente</option>
-                <option value="virtual">Virtual</option>
-                <option value="presencial">Presencial</option>
+                <option
+                  className="hover:bg-[--primary-color-light]"
+                  value="Nuevo paciente"
+                >
+                  Nuevo paciente
+                </option>
+                <option
+                  className="hover:bg-[--primary-color-light]"
+                  value="Seguimiento"
+                >
+                  Seguimiento
+                </option>
               </select>
             </div>
             <div className="space-y-1 flex-1">
@@ -141,12 +220,14 @@ export default function CitasModal({
               <select
                 id="status"
                 name="status"
-                className="p-2 border border-gray-200 rounded-md w-full"
+                className="p-2 border border-gray-200 rounded-md w-full focus:outline-none focus:ring-1 focus:ring-[--primary-color]"
                 value={formData.status}
                 onChange={handleChange}
               >
                 <option value="Confirmada">Confirmada</option>
                 <option value="Pendiente">Pendiente</option>
+                <option value="Cancelada">Cancelada</option>
+                <option value="Finalizada">Finalizada</option>
               </select>
             </div>
           </div>
@@ -158,7 +239,8 @@ export default function CitasModal({
               Guardar
             </button>
             <button
-              onClick={onClose}
+              type="button"
+              onClick={handleCancel}
               className="bg-red-100 text-red-700 rounded-md p-2 w-full hover:bg-red-200"
             >
               Cancelar

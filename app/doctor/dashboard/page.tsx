@@ -9,9 +9,9 @@ import { OpenInNewRounded } from "@mui/icons-material";
 import ControlPrenatalForm from "../../../components/ControlPrenatalFrom";
 import { Skeleton, Tooltip } from "@mui/material";
 import {
+  getAllAppointments,
   getAppointmentByDoctor,
-  saveAppointmentDetails,
-  saveAppointmentId,
+  updateAppointmentDetails,
 } from "@/src/services/citasService";
 import {
   AppointmentDetailsModel,
@@ -26,10 +26,29 @@ const currentDate = new Date().toLocaleDateString("es-ES", {
 
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
-  const [formData, setFormData] = useState<AppointmentDetailsModel>({});
+  const [formData, setFormData] = useState<AppointmentModel>({
+    _id: "",
+    doctor: JSON.parse(localStorage.getItem("user_info") || "{}")._id,
+    patient_name: "",
+    record: "",
+    date: "",
+    time: "",
+    date_type: "",
+    status: "",
+    patient: "",
+    file: "",
+    weight: 0,
+    bloodPressure: "",
+    fetalHeartRate: "",
+    fetalStatus: "",
+    observations: "",
+    prescription: "",
+  });
   const [isEditing, setIsEditing] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingDetails, setIsSavingDetails] = useState(false);
+  const [currentPatient, setCurrentPatient] =
+    useState<null | AppointmentDetailsModel>(null);
 
   const handleEditClick = async () => {
     localStorage.setItem("currentPatientDetails", JSON.stringify(formData));
@@ -37,9 +56,13 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
+    setCurrentPatient(null);
+    localStorage.removeItem("currentPatient");
+
     setIsLoading(true);
     const loadAppointments = async () => {
-      const fetchedAppointments = await getAppointmentByDoctor("Confirmada");
+      const fetchedAppointments = await getAppointmentByDoctor();
+      // const fetchedAppointments = await getAppointmentByDoctor("Confirmada");
       setAppointments(fetchedAppointments);
     };
 
@@ -48,27 +71,14 @@ export default function DashboardPage() {
 
   appointments.sort((a, b) => (a.time > b.time ? 1 : -1));
 
-  const [currentPatient, setCurrentPatient] = useState<null | AppointmentModel>(
-    null
-  );
-
   const handleAppointmentClick = async (appointment: AppointmentModel) => {
     if (currentPatient?.patient === appointment.patient) {
+      formData._id = appointment._id;
       setIsSavingDetails(true);
       formData.status = "Finalizada";
-      const newAppointment = await saveAppointmentDetails(formData);
-      const appointmentId = formData._id ? formData._id : newAppointment._id;
-      await saveAppointmentId(
-        formData.patient,
-        appointmentId,
-        formData.date
-      ).finally(() => setIsSavingDetails(false));
-
-      appointments.map((app) => {
-        if (app.patient === appointment.patient) {
-          app.status = "Finalizada";
-        }
-      });
+      await updateAppointmentDetails(formData).finally(() =>
+        setIsSavingDetails(false)
+      );
 
       setCurrentPatient(null); // Ends the current appointment
       localStorage.removeItem("currentPatient");
@@ -78,20 +88,21 @@ export default function DashboardPage() {
       setFormData(
         new AppointmentDetailsModel(
           appointment._id,
-          appointment.file,
           appointment.patient,
           appointment.patient_name,
+          appointment.record,
           appointment.doctor,
-          appointment.date.slice(0, 10),
+          appointment.file,
+          appointment.date,
           appointment.time,
           appointment.date_type,
           appointment.status,
-          0,
-          "",
-          "",
-          "",
-          "",
-          ""
+          appointment.weight,
+          appointment.bloodPressure,
+          appointment.fetalHeartRate,
+          appointment.fetalStatus,
+          appointment.observations,
+          appointment.prescription
         )
       );
       localStorage.setItem("currentPatient", JSON.stringify(appointment));
@@ -148,14 +159,14 @@ export default function DashboardPage() {
               action={
                 currentPatient && (
                   <div className="space-x-2">
-                    <button
+                    {/* <button
                       onClick={handleEditClick}
                       className="
                     bg-[--primary-color] text-white rounded-md py-1 px-4 hover:bg-[#db51d4]
                   "
                     >
                       {isEditing ? "Guardar" : "Editar"}
-                    </button>
+                    </button> */}
                     <Tooltip title="Ver expediente" placement="top-start">
                       <button
                         className="border border-[--primary-color] text-[--primary-color] rounded-md py-1 px-2 hover:bg-[#f7d0f4]"
