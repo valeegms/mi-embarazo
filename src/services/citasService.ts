@@ -29,7 +29,7 @@ export async function getAllAppointments(): Promise<AppointmentModel[]> {
   }
 }
 
-export async function getAppointmentByPatient(id: string): Promise<any> {
+export async function getAppointmentByPatient(id: string): Promise<AppointmentDetailsModel[]> {
   try {
     const response = await fetch(`${API_BASE_URL}/appointments/patients/${id}`, {
       method: "GET",
@@ -43,7 +43,7 @@ export async function getAppointmentByPatient(id: string): Promise<any> {
     }
 
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
-    const appointment: any = await response.json();
+    const appointment: AppointmentDetailsModel[] = await response.json();
     console.log("Cita:", appointment);
     return appointment;
   } catch (error) {

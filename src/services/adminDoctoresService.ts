@@ -1,4 +1,5 @@
 import { DoctorModel } from "../models/DoctorModel";
+import { getHeaders } from "./apiConfig";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -103,4 +104,18 @@ export async function deleteDoctor(id: string): Promise<void> {
   if (!response.ok) {
     throw new Error("Error deleting doctor");
   }
+}
+
+export async function getDoctorById(id: string) {
+  const response = await fetch(`${API_BASE_URL}/doctors/${id}`, {
+    method: "GET",
+    headers: getHeaders()
+  });
+
+  if (!response.ok) {
+    throw new Error("Error fetching doctor");
+  }
+
+  const data: DoctorModel = await response.json();
+  return data;
 }

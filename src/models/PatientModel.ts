@@ -11,7 +11,6 @@ export class PatientModel {
     pregnancyData: PregnancyData;
     medicalHistory: MedicalHistory;
     last_appointment?: string;
-    last_appointment_id?: string;
 
     constructor(
         _id: string = '',
@@ -26,7 +25,6 @@ export class PatientModel {
         pregnancyData: PregnancyData = new PregnancyData('','','',0,0,'','',''),
         medicalHistory: MedicalHistory = new MedicalHistory('','','',''),
         last_appointment: string = '',
-        last_appointment_id: string = ''
     ) {
         this._id = _id;
         this.record = record;
@@ -40,7 +38,6 @@ export class PatientModel {
         this.pregnancyData = pregnancyData;
         this.medicalHistory = medicalHistory;
         this.last_appointment = last_appointment;
-        this.last_appointment_id = last_appointment_id;
     }
 }
 

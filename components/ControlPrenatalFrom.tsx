@@ -2,18 +2,17 @@ import React from "react";
 import Input from "./ui/Input";
 import TextField from "./ui/TextField";
 import { AppointmentDetailsModel } from "@/src/models/AppointmentModel";
-import { PregnancyData } from "@/src/models/PatientModel";
 
 interface ControlPrenatalFormProps {
   formData: AppointmentDetailsModel;
   updateData: (data: (prevData: any) => any) => void;
-  isEditing: boolean;
+  isEditing?: boolean;
 }
 
 export default function ControlPrenatalForm({
   formData,
   updateData,
-  isEditing,
+  isEditing = true,
 }: ControlPrenatalFormProps) {
   const handleChange = (
     e: React.ChangeEvent<

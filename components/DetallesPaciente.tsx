@@ -5,7 +5,6 @@ import Avatar from "./ui/Avatar";
 import PatientRecord from "./ui/PatientRecord";
 import { useEffect, useState } from "react";
 import { PatientModel } from "@/src/models/PatientModel";
-import { DateTime } from "luxon";
 import { LinearProgress } from "@mui/material";
 import { AppointmentDetailsModel } from "@/src/models/AppointmentModel";
 import { getAppointmentByPatient } from "@/src/services/citasService";
@@ -17,8 +16,11 @@ export default function DetallesPaciente({
 }) {
   const { record } = params;
   const [patient, setPatient] = useState<PatientModel>(new PatientModel());
-  const [appointmentDetails, setAppointmentDetails] =
-    useState<AppointmentDetailsModel>({
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentDetails, setAppointmentDetails] = useState<
+    AppointmentDetailsModel[]
+  >([
+    {
       _id: "",
       doctor: "",
       patient: "",
@@ -35,39 +37,38 @@ export default function DetallesPaciente({
       fetalStatus: "",
       observations: "",
       prescription: "",
-    });
+    },
+  ]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (record) {
-      const fetchPatient = async () => {
-        const fetchedPatient = await getPatientById(record).finally(() => {
+      const fetchData = async () => {
+        try {
+          const [fetchedPatient, fetchedAppointmentDetails] = await Promise.all(
+            [getPatientById(record), getAppointmentByPatient(record)]
+          );
+
+          setPatient(fetchedPatient);
+
+          if (fetchedAppointmentDetails.length > 0) {
+            setAppointmentDetails(fetchedAppointmentDetails);
+            setAppointmentDate(
+              fetchedAppointmentDetails[fetchedAppointmentDetails.length - 1]
+                .date
+            );
+          }
+        } catch (error) {
+          console.error(error);
+        } finally {
           setIsLoading(false);
-        });
-        setPatient(fetchedPatient);
+        }
       };
 
-      fetchPatient();
+      fetchData();
     }
   }, []);
 
-  useEffect(() => {
-    const fetchAppointmentDetails = async () => {
-      const fetchedAppointmentDetails = await getAppointmentByPatient(
-        patient._id
-      ).finally(() => {
-        setIsLoading(false);
-      });
-      console.log("fetchedAppointmentDetails", fetchedAppointmentDetails);
-      setAppointmentDetails(fetchedAppointmentDetails[0]);
-    };
-
-    if (patient) fetchAppointmentDetails();
-  }, [patient]);
-
-  const appointmentDate = DateTime.isDateTime(patient.last_appointment)
-    ? patient.last_appointment
-    : patient.date;
   const lastAppointmentDate = new Date(appointmentDate).toLocaleDateString(
     "es-MX",
     {
@@ -77,7 +78,8 @@ export default function DetallesPaciente({
     }
   );
 
-  console.log("date", DateTime.isDateTime(lastAppointmentDate));
+  console.log("appointmentDetails -> date", appointmentDate);
+  console.log("lastAppointmentDate", lastAppointmentDate);
 
   return (
     <div>
@@ -88,14 +90,13 @@ export default function DetallesPaciente({
         </div>
         <p className="text-gray-400 pt-1">
           <span className="font-bold">Última cita:</span>{" "}
-          {DateTime.isDateTime(lastAppointmentDate)
-            ? lastAppointmentDate
-            : "Sin citas"}
+          {appointmentDate ? lastAppointmentDate : "Sin citas"}
         </p>
       </section>
       <PatientRecord
         patient={patient}
         appointmentDetails={appointmentDetails}
+        isPatientLoading={isLoading}
       />
       {isLoading && (
         <LinearProgress

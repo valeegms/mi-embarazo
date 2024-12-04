@@ -38,6 +38,7 @@ export async function getPatientsByDoctor(): Promise<PatientModel[]> {
 
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
     const patients: PatientModel[] = await response.json();
+    console.log(patients);
     return patients;
   } catch (error) {
     console.error("Error al obtener citas:", error);
@@ -88,6 +89,20 @@ export async function savePatientDetails(id: string, patient: PatientModel) {
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify(patient),
+    });
+
+    return handleResponse(response);
+  } catch (error) {
+    console.error("Error al obtener citas:", error);
+    throw error; // Relanza el error para manejo adicional
+  }
+}
+
+export async function deletePatient(patient: PatientModel) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/patients/${patient._id}`, {
+      method: "DELETE",
+      headers: getHeaders(),
     });
 
     return handleResponse(response);

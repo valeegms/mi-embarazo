@@ -5,11 +5,13 @@ export default function DeleteModal({
   onClose,
   title,
   message,
+  handleDelete,
 }: {
   isOpen: boolean;
   onClose: () => void;
   title: string;
   message: string;
+  handleDelete: () => void;
 }) {
   return (
     <Modal open={isOpen}>
@@ -18,7 +20,13 @@ export default function DeleteModal({
           <h2 className="text-xl font-bold mb-4">{title}</h2>
           <p className="mb-4">{message}</p>
           <div className="flex justify-end space-x-4">
-            <button className="bg-[--primary-color] text-white rounded-md p-2 w-full">
+            <button
+              onClick={() => {
+                handleDelete();
+                onClose();
+              }}
+              className="bg-[--primary-color] text-white rounded-md p-2 w-full"
+            >
               Eliminar
             </button>
             <button

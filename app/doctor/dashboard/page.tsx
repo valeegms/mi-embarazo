@@ -9,7 +9,6 @@ import { OpenInNewRounded } from "@mui/icons-material";
 import ControlPrenatalForm from "../../../components/ControlPrenatalFrom";
 import { Skeleton, Tooltip } from "@mui/material";
 import {
-  getAllAppointments,
   getAppointmentByDoctor,
   updateAppointmentDetails,
 } from "@/src/services/citasService";
@@ -44,16 +43,10 @@ export default function DashboardPage() {
     observations: "",
     prescription: "",
   });
-  const [isEditing, setIsEditing] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [currentPatient, setCurrentPatient] =
     useState<null | AppointmentDetailsModel>(null);
-
-  const handleEditClick = async () => {
-    localStorage.setItem("currentPatientDetails", JSON.stringify(formData));
-    setIsEditing((prev) => !prev);
-  };
 
   useEffect(() => {
     setCurrentPatient(null);
@@ -62,7 +55,6 @@ export default function DashboardPage() {
     setIsLoading(true);
     const loadAppointments = async () => {
       const fetchedAppointments = await getAppointmentByDoctor();
-      // const fetchedAppointments = await getAppointmentByDoctor("Confirmada");
       setAppointments(fetchedAppointments);
     };
 
@@ -190,7 +182,6 @@ export default function DashboardPage() {
                   <ControlPrenatalForm
                     formData={formData}
                     updateData={setFormData}
-                    isEditing={isEditing}
                   />
                 </div>
               )}

@@ -1,7 +1,7 @@
 import Input from "../Input";
 import Card from "../Card";
 import TextField from "../TextField";
-import { PatientModel } from "@/src/models/PatientModel";
+import { AppointmentDetailsModel } from "@/src/models/AppointmentModel";
 
 export interface TabPanelProps {
   index: number;
@@ -9,6 +9,8 @@ export interface TabPanelProps {
   formData: any;
   updateData: any;
   isEditing?: boolean;
+  isLoading?: boolean;
+  appointments?: AppointmentDetailsModel[];
 }
 
 export default function DetailsTab(props: TabPanelProps) {
@@ -20,7 +22,15 @@ export default function DetailsTab(props: TabPanelProps) {
     >
   ) => {
     const { name, value } = e.target;
-    updateData({ [name]: value });
+    if (name.includes("personalData")) {
+      updateData({ personalData: { [name]: value } });
+    } else if (name.includes("pregnancyData")) {
+      updateData({ pregnancyData: { [name]: value } });
+    } else if (name.includes("medicalHistory")) {
+      updateData({ medicalHistory: { [name]: value } });
+    } else {
+      updateData({ [name]: value });
+    }
   };
 
   return (

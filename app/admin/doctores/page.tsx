@@ -95,12 +95,10 @@ export default function DoctoresPage() {
       try {
         await deleteDoctor(doctorToDelete.id);
 
-        // Actualizamos el estado eliminando al doctor
         setDoctors((prevDoctors) =>
           prevDoctors.filter((doc) => doc.id !== doctorToDelete.id)
         );
 
-        // Actualizamos los doctores filtrados
         setFilteredDoctors((prevFiltered) =>
           prevFiltered.filter((doc) => doc.id !== doctorToDelete.id)
         );

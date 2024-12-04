@@ -10,22 +10,19 @@ import { PatientModel } from "@/src/models/PatientModel";
 export default function PatientCard({
   patient,
   role,
+  handleDelete,
+  doctor,
 }: {
   patient: PatientModel;
   role: string;
+  handleDelete: (patient: PatientModel) => void;
+  doctor: string;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleRowClick = (patient: PatientModel) => {
-    // window.open(`/${role}/pacientes/${patientId}`, "_blank");
     console.log("Opening patient record: ", patient);
     window.open(`/${role}/pacientes/${patient._id}`, "_blank");
-  };
-
-  const handleDelete = (patientId: string) => {
-    // TODO: Implement delete patient
-    console.log("Deleting patient with record: ", patientId);
-    setIsModalOpen(true);
   };
 
   return (
@@ -43,12 +40,17 @@ export default function PatientCard({
       <Divider className="mt-2" />
       <section className="justify-self-end mt-2">
         {role == "admin" && (
-          <button
-            className="text-red-600 font-bold hover:text-red-800"
-            onClick={() => handleDelete(patient._id!)}
-          >
-            <DeleteRounded />
-          </button>
+          <>
+            <small>Doctor asignado:</small>
+            <span>{doctor}</span>
+
+            <button
+              className="text-red-600 font-bold hover:text-red-800"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <DeleteRounded />
+            </button>
+          </>
         )}
         <button
           className="text-[--primary-color] font-bold hover:text-[--primary-color-dark]"
@@ -60,6 +62,7 @@ export default function PatientCard({
         <DeleteModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          handleDelete={() => handleDelete(patient)}
           title="Eliminar paciente"
           message="¿Estás seguro que deseas eliminar este paciente? Esta acción no se
             puede deshacer."
