@@ -33,18 +33,19 @@ export default function CitasModal({
   onClose,
   appointment,
   availablePatients,
-  setShouldRefetch,
+  fetchData,
 }: {
   isOpen: boolean;
   onClose: () => void;
   appointment?: AppointmentModel;
   availablePatients: PatientModel[];
-  setShouldRefetch: (shouldRefetch: boolean) => void;
+  fetchData: () => void;
 }) {
   const [formData, setFormData] = useState<AppointmentModel>(resetForm);
 
   useEffect(() => {
     if (appointment) {
+      console.log("Appointment:", appointment); // Debugging
       const formattedAppointment = {
         ...appointment,
         time: DateTime.fromFormat(appointment.time, "HH:mm").toFormat("HH:mm"),
@@ -111,7 +112,7 @@ export default function CitasModal({
     }
 
     onClose();
-    setShouldRefetch(true);
+    fetchData();
   };
 
   const handleCancel = () => {

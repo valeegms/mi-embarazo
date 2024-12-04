@@ -1,5 +1,5 @@
 export class AppointmentModel {
-  _id: unknown;
+  _id: string;
   patient: unknown;
   patient_name: string;
   record: string;
@@ -17,7 +17,7 @@ export class AppointmentModel {
   prescription: string;
 
   constructor(
-    _id: unknown,
+    _id: string,
     patient: unknown,
     patient_name: string,
     record: string,

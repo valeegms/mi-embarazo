@@ -6,6 +6,7 @@ import CitasModal from "@/components/ui/CitasModal";
 import Input from "@/components/ui/Input";
 import DeleteModal from "@/components/ui/DeleteModal";
 import {
+  deleteAppointment,
   getAllAppointments
 } from "@/src/services/citasService";
 import { AppointmentModel } from "@/src/models/AppointmentModel";
@@ -28,23 +29,24 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   const [shouldRefetch, setShouldRefetch] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      try {
-        const [appointmentsData, patientsData] = await Promise.all([
-          getAllAppointments(),
-          getAllPatients(),
-        ]);
-        setAppointments(appointmentsData);
-        setAvailablePatients(patientsData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [appointmentsData, patientsData] = await Promise.all([
+        getAllAppointments(),
+        getAllPatients(),
+      ]);
+      setAppointments(appointmentsData);
+      setAvailablePatients(patientsData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+
+  useEffect(() => {
     fetchData();
   }, [shouldRefetch]);
 
@@ -61,11 +63,28 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
     setSelectedAppointment(appointment);
     setIsCitasModalOpen(true);
   };
+
   const handleDeleteAppointment = (appointment: AppointmentModel) => {
-    setAppointments((prev) =>
-      prev.filter((appt) => appt.record !== appointment.record)
-    );
+    setSelectedAppointment(appointment);
     setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteAppointment = async () => {
+    try {
+      setIsDeleteModalOpen(false);
+      setIsLoading(true);
+      await deleteAppointment(selectedAppointment!._id);
+
+      setAppointments((prevAppointments) =>
+        prevAppointments.filter((a) => a._id !== selectedAppointment!._id)
+      );
+    }
+    catch (error) {
+      console.error("Error deleting appointment:", error);
+    }
+    finally {
+      setIsLoading(false);
+    }
   };
 
   const filteredAppointments = appointments.filter((appointment) => {
@@ -116,6 +135,9 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
         onClose={() => setIsDeleteModalOpen(false)}
         title="Eliminar cita"
         message="¿Estás seguro que deseas eliminar esta cita? Esta acción no se puede deshacer."
+        onConfirm={() => {
+          confirmDeleteAppointment();
+        }}
       />
 
       <CitasModal
@@ -123,7 +145,7 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
         onClose={() => setIsCitasModalOpen(false)}
         appointment={selectedAppointment}
         availablePatients={availablePatients}
-        setShouldRefetch={setShouldRefetch}
+        fetchData={fetchData}
       />
     </main>
   );
