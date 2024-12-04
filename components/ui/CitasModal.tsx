@@ -33,13 +33,13 @@ export default function CitasModal({
   onClose,
   appointment,
   availablePatients,
-  setShouldRefetch,
+  fetchData,
 }: {
   isOpen: boolean;
   onClose: () => void;
   appointment?: AppointmentModel;
   availablePatients: PatientModel[];
-  setShouldRefetch: (shouldRefetch: boolean) => void;
+  fetchData: () => void;
 }) {
   const [formData, setFormData] = useState<AppointmentModel>(resetForm);
 
@@ -111,7 +111,7 @@ export default function CitasModal({
     }
 
     onClose();
-    setShouldRefetch(true);
+    fetchData();
   };
 
   const handleCancel = () => {
