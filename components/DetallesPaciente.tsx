@@ -78,9 +78,6 @@ export default function DetallesPaciente({
     }
   );
 
-  console.log("appointmentDetails -> date", appointmentDate);
-  console.log("lastAppointmentDate", lastAppointmentDate);
-
   return (
     <div>
       <section className="pb-4">

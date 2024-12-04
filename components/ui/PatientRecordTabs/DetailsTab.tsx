@@ -11,6 +11,7 @@ export interface TabPanelProps {
   isEditing?: boolean;
   isLoading?: boolean;
   appointments?: AppointmentDetailsModel[];
+  setIsAppointmentDataChanged?: any;
 }
 
 export default function DetailsTab(props: TabPanelProps) {

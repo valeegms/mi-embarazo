@@ -42,6 +42,9 @@ export default function PatientRecord({
         ""
       )
     );
+  const [isPatientDataChanged, setIsPatientDataChanged] = useState(false);
+  const [isAppointmentDataChanged, setIsAppointmentDataChanged] =
+    useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -52,6 +55,7 @@ export default function PatientRecord({
       pregnancyData: { ...prevData.pregnancyData, ...data },
       medicalHistory: { ...prevData.medicalHistory, ...data },
     }));
+    setIsPatientDataChanged(true);
   };
 
   const detailsTabProps = {
@@ -60,13 +64,13 @@ export default function PatientRecord({
     updateData,
   };
 
-  // TODO: implement appointments as a list
   const controlPrenatalProps = {
     isEditing,
     formData: controlPrenatalformData,
     updateData: setcontrolPrenatalFormData,
     isLoading: isPatientLoading,
     appointments: appointmentDetails,
+    setIsAppointmentDataChanged,
   };
 
   const tabs = [
@@ -97,15 +101,21 @@ export default function PatientRecord({
       try {
         setIsLoading(true);
 
-        const formDataWithoutId = { ...formData };
-        delete formDataWithoutId._id;
+        if (isPatientDataChanged) {
+          const patientDataWithoutId = { ...formData };
+          delete patientDataWithoutId._id;
+          await savePatientDetails(patient._id!, patientDataWithoutId);
+        }
 
-        const controlPrenatalformDataWithoutId = { ...controlPrenatalformData };
-        delete controlPrenatalformDataWithoutId._id;
-
-        await savePatientDetails(patient._id!, formDataWithoutId);
-        if (appointmentDetails.length > 0)
-          await updateAppointmentDetails(controlPrenatalformDataWithoutId);
+        if (isAppointmentDataChanged) {
+          const appointmentDataWithParsedDate = {
+            ...controlPrenatalformData,
+            date:
+              DateTime.fromISO(controlPrenatalformData.date).toISODate() ||
+              DateTime.now().toISODate(),
+          };
+          await updateAppointmentDetails(appointmentDataWithParsedDate);
+        }
       } catch (error) {
         console.error("Error saving patient details:", error);
       } finally {

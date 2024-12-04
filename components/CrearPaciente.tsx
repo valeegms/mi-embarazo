@@ -15,6 +15,7 @@ export default function CrearPaciente() {
   const router = useRouter();
   const role = pathname.split("/")[1];
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingDoctors, setIsFetchingDoctors] = useState(false);
   const [doctors, setDoctors] = useState<DoctorModel[]>([]);
 
   const [tab, setTab] = useState(0);
@@ -22,10 +23,20 @@ export default function CrearPaciente() {
 
   const fetchDoctorsAdmin = async () => {
     try {
+      setIsFetchingDoctors(true);
       const fetchedDoctors = await fetchDoctors();
       setDoctors(fetchedDoctors);
+
+      if (fetchedDoctors.length > 0) {
+        setFormData((prevData) => ({
+          ...prevData,
+          doctor: fetchedDoctors[0].id,
+        }));
+      }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsFetchingDoctors(false);
     }
   };
 
@@ -44,7 +55,7 @@ export default function CrearPaciente() {
 
   const savePatient = async () => {
     try {
-      // setIsLoading(true);
+      setIsLoading(true);
       formData.record = `EXP-${Math.floor(Math.random() * 1000000)}`;
 
       if (role == "doctor") {
@@ -54,8 +65,6 @@ export default function CrearPaciente() {
 
       const formDataWithoutId = { ...formData };
       delete formDataWithoutId._id;
-
-      console.log(formDataWithoutId);
 
       await createPatient(formDataWithoutId).finally(() => {
         setFormData(new PatientModel()); // Clear form
@@ -69,36 +78,50 @@ export default function CrearPaciente() {
   //TODO: finish selecting doctor as admin
   return (
     <div>
-      {role === "admin" && (
-        <select
-          value={formData.doctor}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded-md"
-          name="doctors"
-        >
-          <option value="">Selecciona un doctor</option>
-          {doctors.map((doctor) => (
-            <option key={doctor.id} value={doctor.id}>
-              {doctor.name}
-            </option>
-          ))}
-        </select>
-      )}
-      <div className="flex gap-4 justify-end">
-        <Link href={`/${role}/pacientes`} passHref>
-          <Button variant="outlined" color="secondary" disabled={isLoading}>
-            Cancelar
+      <section className="flex justify-between items-center">
+        {role === "admin" && (
+          <div className="flex flex-col">
+            <label
+              className="text-[#8b8b8b] text-sm font-bold pl-2"
+              htmlFor="doctors"
+            >
+              Asignar doctor
+            </label>
+            <select
+              required
+              value={formData.doctor}
+              onChange={handleChange}
+              className="p-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:ring-[--primary-color]"
+              name="doctors"
+              disabled={isFetchingDoctors}
+            >
+              <option hidden={doctors.length > 0} value="">
+                Cargando doctores...
+              </option>
+              {doctors.map((doctor) => (
+                <option key={doctor.id} value={doctor.id}>
+                  {doctor.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        <div className="flex gap-4">
+          <Link href={`/${role}/pacientes`} passHref>
+            <Button variant="outlined" color="secondary" disabled={isLoading}>
+              Cancelar
+            </Button>
+          </Link>
+          <Button
+            onClick={savePatient}
+            variant="contained"
+            color="secondary"
+            disabled={isLoading || isFetchingDoctors}
+          >
+            {isLoading ? "Guardando..." : "Guardar"}
           </Button>
-        </Link>
-        <Button
-          onClick={savePatient}
-          variant="contained"
-          color="secondary"
-          disabled={isLoading}
-        >
-          {isLoading ? "Guardando..." : "Guardar"}
-        </Button>
-      </div>
+        </div>
+      </section>
       <Tabs
         value={tab}
         textColor="secondary"

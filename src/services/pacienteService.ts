@@ -38,7 +38,6 @@ export async function getPatientsByDoctor(): Promise<PatientModel[]> {
 
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
     const patients: PatientModel[] = await response.json();
-    console.log(patients);
     return patients;
   } catch (error) {
     console.error("Error al obtener citas:", error);
