@@ -17,7 +17,7 @@ export default function DoctoresPage() {
   const [doctors, setDoctors] = useState<DoctorModel[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<DoctorModel[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
   const [isDoctorsModalOpen, setIsDoctorsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [doctorToDelete, setDoctorToDelete] = useState<DoctorModel | null>(
@@ -58,8 +58,9 @@ export default function DoctoresPage() {
 
   const handleSaveDoctor = async (newDoctor: DoctorModel) => {
     try {
+      setLoading(true);
       if (newDoctor.id) {
-        // Si el doctor ya existe, lo actualizamos
+        // Si el doctor ya existe, lo actualizamos 
         const updatedDoctor = await updateDoctor(newDoctor.id, newDoctor);
         setDoctors((prevDoctors) =>
           prevDoctors.map((doc) =>
@@ -82,6 +83,7 @@ export default function DoctoresPage() {
       console.error("Error guardando el doctor:", error);
     } finally {
       setIsDoctorsModalOpen(false); // Cerramos el modal
+      setLoading(false);
     }
   };
 
@@ -93,6 +95,7 @@ export default function DoctoresPage() {
   const confirmDeleteDoctor = async () => {
     if (doctorToDelete) {
       try {
+        setLoading(true);
         await deleteDoctor(doctorToDelete.id);
 
         // Actualizamos el estado eliminando al doctor
@@ -107,6 +110,7 @@ export default function DoctoresPage() {
       } catch (error) {
         console.error("Error eliminando el doctor:", error);
       } finally {
+        setLoading(false);
         setIsDeleteModalOpen(false);
         setDoctorToDelete(null);
       }
@@ -131,13 +135,13 @@ export default function DoctoresPage() {
         value={searchTerm}
         onChange={handleSearchChange}
       />
-      {loading && <p>Cargando doctores...</p>}
       <DoctorsTable
         doctors={filteredDoctors}
         onEditDoctor={(doc) => {
           setDoctor(doc);
           setIsDoctorsModalOpen(true);
         }}
+        isLoading={isLoading}
         onDeleteDoctor={openDeleteModal}
       />
 

@@ -5,19 +5,22 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  LinearProgress,
   TableRow,
 } from "@mui/material";
 import { DeleteRounded, Edit } from "@mui/icons-material";
-import { DoctorModel } from "@/models/DoctorModel";
+import { DoctorModel } from "@/src/models/DoctorModel";
 
 type DoctorsTableProps = {
   doctors: DoctorModel[];
+  isLoading?: boolean;
   onEditDoctor: (doctor: DoctorModel) => void;
   onDeleteDoctor: (doctor: DoctorModel) => void;
 };
 
 export default function DoctorsTable({
   doctors,
+  isLoading,
   onEditDoctor,
   onDeleteDoctor,
 }: DoctorsTableProps) {
@@ -50,6 +53,22 @@ export default function DoctorsTable({
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
+        {isLoading ? (
+          <TableBody>
+            <TableRow>
+              <TableCell colSpan={7}>
+                <LinearProgress
+                  color="secondary"
+                  sx={{
+                    width: "76rem",
+                    height: "0.5rem",
+                    borderRadius: "0.25rem",
+                  }}
+                />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        ) : (
         <TableBody>
           {doctors.map((doctor, index) => (
             <TableRow key={index}>
@@ -78,7 +97,7 @@ export default function DoctorsTable({
               </TableCell>
             </TableRow>
           ))}
-        </TableBody>
+        </TableBody>)}
       </Table>
     </TableContainer>
   );

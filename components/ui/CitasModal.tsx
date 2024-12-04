@@ -45,7 +45,6 @@ export default function CitasModal({
 
   useEffect(() => {
     if (appointment) {
-      console.log("Appointment:", appointment); // Debugging
       const formattedAppointment = {
         ...appointment,
         time: DateTime.fromFormat(appointment.time, "HH:mm").toFormat("HH:mm"),

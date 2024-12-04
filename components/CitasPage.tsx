@@ -6,8 +6,7 @@ import CitasModal from "@/components/ui/CitasModal";
 import Input from "@/components/ui/Input";
 import DeleteModal from "@/components/ui/DeleteModal";
 import {
-  getAllAppointments,
-  getAppointmentByDoctor,
+  getAllAppointments
 } from "@/src/services/citasService";
 import { AppointmentModel } from "@/src/models/AppointmentModel";
 import { getAllPatients } from "@/src/services/pacienteService";
@@ -62,8 +61,6 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
     setSelectedAppointment(appointment);
     setIsCitasModalOpen(true);
   };
-
-  //TODO: Implementar función handleDeleteAppointment
   const handleDeleteAppointment = (appointment: AppointmentModel) => {
     setAppointments((prev) =>
       prev.filter((appt) => appt.record !== appointment.record)
