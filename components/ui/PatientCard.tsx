@@ -20,6 +20,11 @@ export default function PatientCard({
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const confirmDelete = () => {
+    handleDelete(patient);
+    setIsModalOpen(false);
+  };
+
   const handleRowClick = (patient: PatientModel) => {
     window.open(`/${role}/pacientes/${patient._id}`, "_blank");
   };
@@ -31,8 +36,8 @@ export default function PatientCard({
         <div>
           <h3 className="font-bold">{patient.personalData.name}</h3>
           <p className="text-sm text-gray-400">
-            {patient.personalData.age} años |{" "}
-            {patient.pregnancyData.gestationStage} semanas de embarazo
+            {patient.personalData?.age} años |{" "}
+            {patient.pregnancyData?.gestationStage} semanas de embarazo
           </p>
         </div>
       </section>
@@ -81,7 +86,7 @@ export default function PatientCard({
         <DeleteModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          handleDelete={() => handleDelete(patient)}
+          onConfirm={() => confirmDelete()}
           title="Eliminar paciente"
           message="¿Estás seguro que deseas eliminar este paciente? Esta acción no se
             puede deshacer."

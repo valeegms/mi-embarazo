@@ -21,28 +21,37 @@ export default function PacientesPage({ role }: { role: string }) {
   const [doctors, setDoctors] = useState<DoctorModel[]>([]);
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-
   const [isLoading, setIsLoading] = useState(true);
-  //TODO: finish styling doctor input
+  const [isDeletingPatient, setIsDeletingPatient] = useState(false);
+
   const fetchData = async () => {
     try {
+      setIsLoading(true);
       const patientPromise =
         role === "doctor" ? getPatientsByDoctor() : getAllPatients();
-      const doctorPromise =
-        role === "admin" ? fetchDoctors() : Promise.resolve([]);
+      let doctorPromise: Promise<DoctorModel[]> = Promise.resolve([]);
 
-      // Combine both API calls
+      if (role === "doctor" || isDeletingPatient) {
+        doctorPromise = Promise.resolve([]);
+      } else if (role === "admin" && !isDeletingPatient) {
+        doctorPromise = fetchDoctors();
+      }
+
       const [fetchedPatients, fetchedDoctors] = await Promise.all([
         patientPromise,
         doctorPromise,
       ]);
 
+      if (isDeletingPatient) {
+        setDoctors(doctors);
+      } else setDoctors(fetchedDoctors);
+
       setPatients(fetchedPatients);
-      setDoctors(fetchedDoctors);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
       setIsLoading(false);
+      setIsDeletingPatient(false);
     }
   };
 
@@ -52,23 +61,24 @@ export default function PacientesPage({ role }: { role: string }) {
 
   const handleDelete = async (patient: PatientModel) => {
     try {
-      setPatients(patients.filter((p) => p._id !== patient._id));
-      await deletePatient(patient);
-      fetchData();
+      setIsLoading(true);
+
+      setIsDeletingPatient(true);
+      await deletePatient(patient).finally(() => {
+        fetchData();
+      });
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
   const filteredPatients = patients.filter((patient) => {
-    const fullName = patient.personalData.name.toLowerCase();
+    const fullName = patient.personalData?.name?.toLowerCase();
     const doctorName =
       doctors
         .find((doc) => doc.id === patient.doctor)
         ?.name.toLocaleLowerCase() || "";
-    const record = patient.record.toLowerCase();
+    const record = patient?.record?.toLowerCase();
     const searchTerm = searchQuery.toLowerCase();
 
     return (
@@ -81,7 +91,7 @@ export default function PacientesPage({ role }: { role: string }) {
   return (
     <Card
       title="Pacientes"
-      subtitle={`(${filteredPatients.length}) pacientes`}
+      subtitle={`(${patients.length}) pacientes`}
       action={
         <Link href={`/${role}/pacientes/crear`}>
           <button className="flex items-center space-x-2 font-bold text-[--primary-color] hover:text-[--primary-color-dark]">
@@ -92,6 +102,12 @@ export default function PacientesPage({ role }: { role: string }) {
       }
     >
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {isLoading && (
+          <LinearProgress
+            color="secondary"
+            sx={{ width: "75rem", height: "0.5rem", borderRadius: "0.25rem" }}
+          />
+        )}
         <Input
           name="search"
           placeholder="Buscar paciente por nombre, doctor o expediente"
@@ -100,12 +116,6 @@ export default function PacientesPage({ role }: { role: string }) {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {isLoading && (
-          <LinearProgress
-            color="secondary"
-            sx={{ width: "75rem", height: "0.5rem", borderRadius: "0.25rem" }}
-          />
-        )}
         {filteredPatients.map(
           (patient: PatientModel, index) =>
             patient.personalData.name != null && (
