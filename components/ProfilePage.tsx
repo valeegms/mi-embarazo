@@ -48,7 +48,7 @@ export default function ProfilePage({ role }: { role: string }) {
 
   const verifyCurrentPassword = async () => {
     try {
-      const response = await verifyPassword(
+      const response: any = await verifyPassword(
         formData.email,
         formData.currentPassword
       );
@@ -103,7 +103,7 @@ export default function ProfilePage({ role }: { role: string }) {
     localStorage.setItem("user_info", JSON.stringify(formData));
 
     try {
-      await updateProfile(formData);
+      await updateProfile(formData as any);
       setIsEditing(false); // Exit edit mode
       alert("Cambios guardados con éxito.");
     } catch (error) {

@@ -14,7 +14,7 @@ const resetForm: AppointmentModel = new AppointmentModel(
   "",
   "",
   "",
-  JSON.parse(localStorage.getItem("user_info") || "{}")._id,
+  "",
   null!,
   DateTime.now().toISODate(),
   DateTime.now().toFormat("HH:mm"),
@@ -103,10 +103,9 @@ export default function CitasModal({
     if (appointment !== undefined) {
       updateAppointment(formData);
     } else {
-      const formDataWithoutId = { ...formData };
-      delete formDataWithoutId._id;
+      const { _id, ...formDataWithoutId } = formData;
 
-      saveNewAppointment(formDataWithoutId);
+      saveNewAppointment(formDataWithoutId as AppointmentModel);
       setFormData(resetForm);
     }
 

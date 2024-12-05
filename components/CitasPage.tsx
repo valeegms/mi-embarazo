@@ -13,8 +13,6 @@ import { AppointmentModel } from "@/src/models/AppointmentModel";
 import { getAllPatients } from "@/src/services/pacienteService";
 import { PatientModel } from "@/src/models/PatientModel";
 
-const LOCAL_STORAGE_KEY = "appointments";
-
 export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isCitasModalOpen, setIsCitasModalOpen] = useState(false);
@@ -47,10 +45,6 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   useEffect(() => {
     fetchData();
   }, []);
-
-  useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appointments));
-  }, [appointments]);
 
   const handleNewAppointment = () => {
     setSelectedAppointment(undefined);

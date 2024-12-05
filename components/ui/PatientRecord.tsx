@@ -28,7 +28,7 @@ export default function PatientRecord({
         "",
         "",
         "",
-        JSON.parse(localStorage.getItem("user_info") || "{}")._id,
+        "",
         null!,
         DateTime.now().toISODate(),
         DateTime.now().toFormat("HH:mm"),

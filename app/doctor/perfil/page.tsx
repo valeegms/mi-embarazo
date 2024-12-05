@@ -1,6 +1,6 @@
 import ProfilePage from "../../../components/ProfilePage";
 
-export default function DoctorPerfilPage() {
+export default async function DoctorPerfilPage() {
   return (
     <>
       <ProfilePage role="doctor" />

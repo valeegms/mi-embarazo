@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import Navbar from "../../components/Navbar";
 import { useAuth } from "../../context/AuthContext";
 
-export const username = "José Pérez";
-
 export default function DashboardLayout({
   children,
 }: Readonly<{

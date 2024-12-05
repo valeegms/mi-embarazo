@@ -12,13 +12,23 @@ import {
   LogoutRounded,
 } from "@mui/icons-material";
 import { deleteCookie } from "cookies-next";
+import { useEffect, useState } from "react";
 
 export default function Navbar({ role }: { role: string }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const user_info = JSON.parse(localStorage.getItem("user_info") || "{}");
-  const username = user_info.name;
+  const [userInformation, setUserInformation] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    role: "",
+    _id: "",
+  });
+
+  useEffect(() => {
+    setUserInformation(JSON.parse(localStorage.getItem("user_info") || "{}"));
+  }, []);
 
   // Para el cierre de sesión :)
   const handleLogout = () => {
@@ -89,8 +99,8 @@ export default function Navbar({ role }: { role: string }) {
               className="flex items-center space-x-2"
               href={`/${role}/perfil`}
             >
-              <Avatar name={username} />
-              <span className="font-medium"> {username} </span>
+              <Avatar name={userInformation.name} />
+              <span className="font-medium"> {userInformation.name} </span>
             </Link>
             <button
               onClick={handleLogout}

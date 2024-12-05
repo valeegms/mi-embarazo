@@ -14,6 +14,7 @@ export default function CrearPaciente() {
   const pathname = usePathname();
   const router = useRouter();
   const role = pathname.split("/")[1];
+  const [doctorId, setDoctorId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingDoctors, setIsFetchingDoctors] = useState(false);
   const [doctors, setDoctors] = useState<DoctorModel[]>([]);
@@ -44,6 +45,9 @@ export default function CrearPaciente() {
     if (role === "admin") {
       fetchDoctorsAdmin();
     }
+    if (role === "doctor") {
+      setDoctorId(JSON.parse(localStorage.getItem("user_info")!)._id);
+    }
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -59,8 +63,7 @@ export default function CrearPaciente() {
       formData.record = `EXP-${Math.floor(Math.random() * 1000000)}`;
 
       if (role == "doctor") {
-        formData.doctor = JSON.parse(localStorage.getItem("user_info")!)
-          ._id as string;
+        formData.doctor = doctorId;
       }
 
       const formDataWithoutId = { ...formData };

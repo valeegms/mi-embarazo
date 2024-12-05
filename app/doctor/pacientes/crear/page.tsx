@@ -1,6 +1,6 @@
 import CrearPaciente from "../../../../components/CrearPaciente";
 
-export default function NewPatientPage() {
+export default async function NewPatientPage() {
   return (
     <>
       <CrearPaciente />

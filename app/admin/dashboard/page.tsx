@@ -12,6 +12,7 @@ import {
 import { Skeleton } from "@mui/material";
 
 export default function DashboardPage() {
+  const [name, setName] = useState("");
   const [isLoadingCounts, setIsLoadingCounts] = useState(true);
   const [counts, setCounts] = useState({
     doctors: 0,
@@ -19,27 +20,25 @@ export default function DashboardPage() {
     appointments: 0,
   });
 
-  useEffect(() => {
-    const loadCounts = async () => {
-      try {
-        const data = await fetchDashboardCounts().finally(() =>
-          setIsLoadingCounts(false)
-        );
-        setCounts(data);
-      } catch (error) {
-        console.error("Error fetching dashboard counts:", error);
-      }
-    };
+  const loadCounts = async () => {
+    try {
+      const data = await fetchDashboardCounts().finally(() =>
+        setIsLoadingCounts(false)
+      );
+      setCounts(data);
+    } catch (error) {
+      console.error("Error fetching dashboard counts:", error);
+    }
+  };
 
+  useEffect(() => {
+    setName(JSON.parse(localStorage.getItem("user_info") || "{}").name);
     loadCounts();
   }, []);
 
   return (
     <main>
-      <h1 className="text-3xl font-bold">
-        Bienvenido/a{" "}
-        {JSON.parse(localStorage.getItem("user_info") || "{}").name},
-      </h1>
+      <h1 className="text-3xl font-bold">Bienvenido/a {name},</h1>
       <p className="text-gray-400 font-light pt-1">
         Revisa la información general sobre el paciente y las próximas citas.
       </p>
@@ -90,7 +89,6 @@ export default function DashboardPage() {
           </>
         )}
       </section>
-      {/* Reutilizamos CitasPage */}
       <CitasPage role="admin" />
     </main>
   );

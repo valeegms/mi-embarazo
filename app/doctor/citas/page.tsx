@@ -1,6 +1,6 @@
 import CitasPage from "../../../components/CitasPage";
 
-export default function DoctorCitasPage() {
+export default async function DoctorCitasPage() {
   return (
     <>
       <CitasPage role="doctor" />
