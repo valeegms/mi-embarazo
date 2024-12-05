@@ -8,6 +8,7 @@ export interface TabPanelProps {
   value: number;
   formData: any;
   updateData: any;
+  isPatientLoading?: boolean;
   isEditing?: boolean;
   isLoading?: boolean;
   appointments?: AppointmentDetailsModel[];
@@ -15,7 +16,8 @@ export interface TabPanelProps {
 }
 
 export default function DetailsTab(props: TabPanelProps) {
-  const { updateData, formData, isEditing, value, index, ...other } = props;
+  const { updateData, formData, isEditing, isLoading, value, index, ...other } =
+    props;
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -50,7 +52,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="name"
                 label="Nombre"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData.name}
               />
@@ -58,7 +60,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="maritalStatus"
                 label="Estado civil"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.maritalStatus}
               />
@@ -66,7 +68,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="gender"
                 label="Género"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.gender}
               />
@@ -74,7 +76,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="occupation"
                 label="Ocupación"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.occupation}
               />
@@ -82,7 +84,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="phone"
                 label="Teléfono"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.phone}
               />
@@ -90,7 +92,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="address"
                 label="Dirección"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 className="row-span-2"
                 onChange={handleChange}
                 value={formData?.personalData?.address}
@@ -99,7 +101,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="age"
                 label="Edad"
                 type="number"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.age}
               />
@@ -107,7 +109,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="birthDate"
                 label="Fecha de nacimiento"
                 type="date"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.birthDate}
               />
@@ -115,7 +117,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="municipality"
                 label="Municipio"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.municipality}
               />
@@ -123,7 +125,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="locality"
                 label="Localidad"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.locality}
               />
@@ -131,7 +133,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="state"
                 label="Estado"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.state}
               />
@@ -139,7 +141,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="email"
                 label="Correo electrónico"
                 type="email"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.email}
               />
@@ -147,7 +149,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="curp"
                 label="CURP"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 onChange={handleChange}
                 value={formData?.personalData?.curp}
               />
@@ -160,7 +162,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="lastMenstruation"
                 label="Fecha de última menstruación"
                 type="date"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.lastMenstruation}
                 onChange={handleChange}
               />
@@ -168,7 +170,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="dueDate"
                 label="Fecha probable de parto"
                 type="date"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.dueDate}
                 onChange={handleChange}
               />
@@ -176,7 +178,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="gestationStage"
                 label="Edad gestacional (semana)"
                 type="number"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.gestationStage}
                 onChange={handleChange}
               />
@@ -184,7 +186,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="previousPregnancies"
                 label="Número de embarazo"
                 type="number"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.previousPregnancies}
                 onChange={handleChange}
               />
@@ -192,7 +194,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="abortions"
                 label="Número de abortos"
                 type="number"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.abortions}
                 onChange={handleChange}
               />
@@ -200,7 +202,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="pregnancyType"
                 label="Tipo de embarazo"
                 type="text"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.pregnancyType}
                 onChange={handleChange}
               />
@@ -208,7 +210,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="complication"
                 label="Complicaciones"
                 className="col-span-2"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.complication}
                 onChange={handleChange}
               />
@@ -216,7 +218,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 name="observations"
                 label="Observaciones"
                 className="col-span-2"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.pregnancyData?.observations}
                 onChange={handleChange}
               />
@@ -228,28 +230,28 @@ export default function DetailsTab(props: TabPanelProps) {
               <TextField
                 name="medicalConditions"
                 label="Condiciones médicas"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.medicalHistory?.medicalConditions}
                 onChange={handleChange}
               />
               <TextField
                 name="gynecologicalHistory"
                 label="Historia ginecológica"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.medicalHistory?.gynecologicalHistory}
                 onChange={handleChange}
               />
               <TextField
                 name="allergies"
                 label="Alergias"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.medicalHistory?.allergies}
                 onChange={handleChange}
               />
               <TextField
                 name="familyHistory"
                 label="Historial Familiar"
-                disabled={!isEditing}
+                disabled={!isEditing || isLoading}
                 value={formData?.medicalHistory?.familyHistory}
                 onChange={handleChange}
               />

@@ -16,6 +16,7 @@ import {
   AppointmentDetailsModel,
   AppointmentModel,
 } from "@/src/models/AppointmentModel";
+import { DateTime } from "luxon";
 
 const currentDate = new Date().toLocaleDateString("es-ES", {
   year: "numeric",
@@ -25,24 +26,26 @@ const currentDate = new Date().toLocaleDateString("es-ES", {
 
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
-  const [formData, setFormData] = useState<AppointmentModel>({
-    _id: "",
-    doctor: JSON.parse(localStorage.getItem("user_info") || "{}")._id,
-    patient_name: "",
-    record: "",
-    date: "",
-    time: "",
-    date_type: "",
-    status: "",
-    patient: "",
-    file: "",
-    weight: 0,
-    bloodPressure: "",
-    fetalHeartRate: "",
-    fetalStatus: "",
-    observations: "",
-    prescription: "",
-  });
+  const [formData, setFormData] = useState<AppointmentDetailsModel>(
+    new AppointmentDetailsModel(
+      "",
+      "",
+      "",
+      "",
+      JSON.parse(localStorage.getItem("user_info") || "{}")._id,
+      null!,
+      DateTime.now().toISODate(),
+      DateTime.now().toFormat("HH:mm"),
+      "Nuevo paciente",
+      "Confirmada",
+      0,
+      "",
+      "",
+      "",
+      "",
+      ""
+    )
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [currentPatient, setCurrentPatient] =
@@ -77,6 +80,7 @@ export default function DashboardPage() {
       localStorage.removeItem("currentPatientDetails");
     } else {
       setCurrentPatient(appointment); // Starts a new appointment
+      const parsedDate = DateTime.fromISO(appointment.date).toISODate();
       setFormData(
         new AppointmentDetailsModel(
           appointment._id,
@@ -85,7 +89,7 @@ export default function DashboardPage() {
           appointment.record,
           appointment.doctor,
           appointment.file,
-          appointment.date,
+          parsedDate!,
           appointment.time,
           appointment.date_type,
           appointment.status,

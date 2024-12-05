@@ -9,6 +9,7 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { useEffect, useState } from "react";
 import { DateTime } from "luxon";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
+import { useDebounce } from "@/hooks/useDebounce";
 
 export default function ControlPrenatalTab(props: TabPanelProps) {
   const {
@@ -16,8 +17,7 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
     index,
     formData,
     updateData,
-    isEditing,
-    isLoading,
+    isPatientLoading,
     appointments,
     setIsAppointmentDataChanged,
   } = props;
@@ -25,7 +25,7 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
   const [date, setDate] = useState(
     formData.date ? DateTime.fromISO(formData.date) : DateTime.now()
   );
-
+  const [error, setError] = useState("");
   useEffect(() => {
     if (appointments) {
       const currentAppointment = appointments.find(
@@ -47,7 +47,6 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
       const nextDate = DateTime.fromISO(appointments![currentIndex + 1].date);
       setDate(nextDate);
       updateData(appointments![currentIndex + 1]);
-      setIsAppointmentDataChanged(true);
     }
   };
 
@@ -61,7 +60,6 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
       const prevDate = DateTime.fromISO(appointments![currentIndex - 1].date);
       setDate(prevDate);
       updateData(appointments![currentIndex - 1]);
-      setIsAppointmentDataChanged(true);
     }
   };
 
@@ -82,6 +80,29 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
     );
   };
 
+  const handleDateChange = (newValue: DateTime | null) => {
+    if (newValue) {
+      const matchingAppointment = appointments?.find(
+        (appointment) =>
+          DateTime.fromISO(appointment.date).toISODate() ===
+          newValue.toISODate()
+      );
+
+      if (matchingAppointment) {
+        setDate(newValue);
+        updateData(matchingAppointment);
+        setError("");
+      } else {
+        setError("No hay registros para esta fecha.");
+        setTimeout(() => {
+          setError("");
+        }, 3000);
+      }
+    }
+  };
+
+  const debouncedHandleDateChange = useDebounce(handleDateChange, 300);
+
   return (
     <div
       className="flex-1"
@@ -98,7 +119,7 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
                 {appointments && (
                   <>
                     <button
-                      disabled={!isEditing || isFirstDate()}
+                      disabled={isFirstDate()}
                       className="text-gray-500 rounded-md border-l border-t border-b border-t-gray-300 border-b-gray-300 rounded-r-none border-l-gray-300 bg-white p-[0.45rem] hover:bg-gray-100 active:bg-gray-200 disabled:bg-gray-200"
                       onClick={handlePreviousDate}
                     >
@@ -106,15 +127,14 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
                     </button>
                     <LocalizationProvider dateAdapter={AdapterLuxon}>
                       <DateField
-                        disabled={!isEditing}
                         value={date}
                         onChange={(newValue) => {
-                          if (newValue) setDate(newValue);
+                          if (newValue) debouncedHandleDateChange(newValue);
                         }}
                       />
                     </LocalizationProvider>
                     <button
-                      disabled={!isEditing || isLastDate()}
+                      disabled={isLastDate()}
                       className="text-gray-500 rounded-md border-r border-t border-b border-t-gray-300 border-b-gray-300 rounded-l-none border-r-gray-300 bg-white p-[0.45rem] hover:bg-gray-100 active:bg-gray-200 disabled:bg-gray-200"
                       onClick={handleNextDate}
                     >
@@ -123,19 +143,26 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
                   </>
                 )}
               </div>
+              {error && (
+                <p className="text-red-500 text-xs font-bold text-center">
+                  {error}
+                </p>
+              )}
               <ControlPrenatalForm
                 formData={formData}
                 updateData={updateData}
-                isEditing={isEditing!}
+                isEditable={false}
+                setIsAppointmentDataChanged={setIsAppointmentDataChanged}
               />
             </>
           ) : (
             <div>
-              {isLoading && !formData._id ? (
+              {isPatientLoading && !formData._id ? (
                 <ControlPrenatalForm
                   formData={formData}
                   updateData={updateData}
-                  isEditing={isEditing!}
+                  isEditable={false}
+                  setIsAppointmentDataChanged={setIsAppointmentDataChanged}
                 />
               ) : (
                 <div className="text-center text-gray-500 mt-4 place-self-center">

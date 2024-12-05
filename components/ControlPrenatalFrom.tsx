@@ -7,12 +7,18 @@ interface ControlPrenatalFormProps {
   formData: AppointmentDetailsModel;
   updateData: (data: (prevData: any) => any) => void;
   isEditing?: boolean;
+  isLoading?: boolean;
+  isEditable?: boolean;
+  setIsAppointmentDataChanged?: (isChanged: boolean) => void;
 }
 
 export default function ControlPrenatalForm({
   formData,
   updateData,
+  isLoading,
   isEditing = true,
+  isEditable = true,
+  setIsAppointmentDataChanged = () => {},
 }: ControlPrenatalFormProps) {
   const handleChange = (
     e: React.ChangeEvent<
@@ -21,6 +27,7 @@ export default function ControlPrenatalForm({
   ) => {
     const { name, value } = e.target;
     updateData((prevData) => ({ ...prevData, [name]: value }));
+    setIsAppointmentDataChanged(true);
   };
 
   return (
@@ -29,46 +36,46 @@ export default function ControlPrenatalForm({
         name="weight"
         label="Peso"
         type="text"
-        disabled={!isEditing}
-        value={formData.weight}
+        disabled={!isEditing || isLoading || !isEditable}
+        value={formData?.weight}
         onChange={handleChange}
       />
       <Input
         name="bloodPressure"
         label="Presión arterial"
         type="text"
-        disabled={!isEditing}
-        value={formData.bloodPressure}
+        disabled={!isEditing || isLoading || !isEditable}
+        value={formData?.bloodPressure}
         onChange={handleChange}
       />
       <Input
         name="fetalHeartRate"
         label="Frecuencia cardiaca fetal"
         type="text"
-        disabled={!isEditing}
-        value={formData.fetalHeartRate}
+        disabled={!isEditing || isLoading || !isEditable}
+        value={formData?.fetalHeartRate}
         onChange={handleChange}
       />
       <Input
         name="fetalStatus"
         label="Estado fetal"
         type="text"
-        disabled={!isEditing}
-        value={formData.fetalStatus}
+        disabled={!isEditing || isLoading || !isEditable}
+        value={formData?.fetalStatus}
         onChange={handleChange}
       />
       <TextField
         name="observations"
         label="Observaciones"
-        disabled={!isEditing}
-        value={formData.observations}
+        disabled={!isEditing || isLoading || !isEditable}
+        value={formData?.observations}
         onChange={handleChange}
       />
       <TextField
         name="prescription"
         label="Prescripción"
-        disabled={!isEditing}
-        value={formData.prescription}
+        disabled={!isEditing || isLoading || !isEditable}
+        value={formData?.prescription}
         onChange={handleChange}
       />
     </>

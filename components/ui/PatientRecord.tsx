@@ -61,6 +61,7 @@ export default function PatientRecord({
   const detailsTabProps = {
     isEditing,
     formData,
+    isLoading,
     updateData,
   };
 
@@ -68,7 +69,8 @@ export default function PatientRecord({
     isEditing,
     formData: controlPrenatalformData,
     updateData: setcontrolPrenatalFormData,
-    isLoading: isPatientLoading,
+    isPatientLoading,
+    isLoading,
     appointments: appointmentDetails,
     setIsAppointmentDataChanged,
   };
@@ -104,7 +106,11 @@ export default function PatientRecord({
         if (isPatientDataChanged) {
           const patientDataWithoutId = { ...formData };
           delete patientDataWithoutId._id;
-          await savePatientDetails(patient._id!, patientDataWithoutId);
+          await savePatientDetails(patient._id!, patientDataWithoutId).finally(
+            () => {
+              setIsPatientDataChanged(false);
+            }
+          );
         }
 
         if (isAppointmentDataChanged) {
@@ -114,7 +120,11 @@ export default function PatientRecord({
               DateTime.fromISO(controlPrenatalformData.date).toISODate() ||
               DateTime.now().toISODate(),
           };
-          await updateAppointmentDetails(appointmentDataWithParsedDate);
+          await updateAppointmentDetails(appointmentDataWithParsedDate).finally(
+            () => {
+              setIsAppointmentDataChanged(false);
+            }
+          );
         }
       } catch (error) {
         console.error("Error saving patient details:", error);

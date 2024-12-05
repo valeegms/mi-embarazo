@@ -37,7 +37,9 @@ export default function PatientCard({
           <h3 className="font-bold">{patient.personalData.name}</h3>
           <p className="text-sm text-gray-400">
             {patient.personalData?.age} años |{" "}
-            {patient.pregnancyData?.gestationStage} semanas de embarazo
+            {patient.pregnancyData?.gestationStage
+              ? `${patient.pregnancyData?.gestationStage} semanas de embarazo`
+              : "N/A"}
           </p>
         </div>
       </section>

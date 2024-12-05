@@ -44,7 +44,6 @@ export async function getAppointmentByPatient(id: string): Promise<AppointmentDe
 
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
     const appointment: AppointmentDetailsModel[] = await response.json();
-    console.log("Cita:", appointment);
     return appointment;
   } catch (error) {
     console.error("Error al obtener citas:", error);
@@ -118,7 +117,6 @@ export async function saveAppointmentId(patientId: unknown, appointment_id: unkn
 
 export async function updateAppointmentDetails(appointment: AppointmentModel | AppointmentDetailsModel) {
   try {
-    console.log("Updating appointment:", appointment);
     const response = await fetch(`${API_BASE_URL}/appointments/${appointment._id}`, {
       method: "PUT",
       headers: getHeaders(),

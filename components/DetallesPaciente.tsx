@@ -16,6 +16,7 @@ export default function DetallesPaciente({
 }) {
   const { record } = params;
   const [patient, setPatient] = useState<PatientModel>(new PatientModel());
+  const [previousAppointment, setPreviousAppointment] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentDetails, setAppointmentDetails] = useState<
     AppointmentDetailsModel[]
@@ -57,6 +58,14 @@ export default function DetallesPaciente({
               fetchedAppointmentDetails[fetchedAppointmentDetails.length - 1]
                 .date
             );
+            if (fetchedAppointmentDetails.length > 1) {
+              setPreviousAppointment(
+                fetchedAppointmentDetails[fetchedAppointmentDetails.length - 2]
+                  .date
+              );
+            } else {
+              setPreviousAppointment("");
+            }
           }
         } catch (error) {
           console.error(error);
@@ -69,14 +78,13 @@ export default function DetallesPaciente({
     }
   }, []);
 
-  const lastAppointmentDate = new Date(appointmentDate).toLocaleDateString(
-    "es-MX",
-    {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-  );
+  const lastAppointmentDate = new Date(
+    previousAppointment ? previousAppointment : appointmentDate
+  ).toLocaleDateString("es-MX", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   return (
     <div>
