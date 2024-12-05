@@ -1,53 +1,72 @@
+"use client";
+
+import { useState } from "react";
+import DeleteModal from "./DeleteModal";
+
 interface AppointmentProps {
   name: string;
   time: string;
-  status: boolean; // Representa si la cita está activa o no
-  isSavingDetails?: boolean; // Indica si se están guardando los detalles de la cita
-  action?: () => void; // Acción opcional para manejar eventos como terminar o iniciar la cita
-  onClick?: () => void; // Acción opcional para manejar clics (como abrir el modal)
+  status: boolean; // Cita activa o no
+  isSavingDetails?: boolean;
+  onStartAppointment?: () => void;
+  onEndAppointment?: () => void;
 }
 
 export default function Appointment({
   name,
   time,
   status,
-  action,
-  onClick,
-  isSavingDetails,
+  onStartAppointment,
+  onEndAppointment,
 }: AppointmentProps) {
-  // Determinar el color de fondo basado en el estado de la cita
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const bgColor = status ? "bg-[#FFD6FD]" : "bg-[#FFE7FE]";
+
+  const handleEndClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirmEnd = () => {
+    onEndAppointment?.();
+    setIsModalOpen(false);
+  };
 
   return (
     <article className={`${bgColor} shadow-sm rounded-lg p-6 text-black`}>
       <section className="flex justify-between items-center w-full">
         <h3 className="text-lg font-light">{name}</h3>
-
-        {/* Mostrar botón solo si onClick está presente */}
-        {onClick && (
-          <button
-            onClick={onClick}
-            disabled={isSavingDetails}
-            className="px-2 bg-[--primary-color] text-white font-bold py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {status
-              ? "Terminar"
-              : `${isSavingDetails ? "Terminando cita..." : "Iniciar"}`}
-          </button>
-        )}
+        <div className="flex space-x-2">
+          {status ? (
+            <button
+              className="text-[--primary-color] border border-[--primary-color] rounded-md py-1 px-2 hover:bg-[#d144c9]/50"
+              onClick={handleEndClick}
+            >
+              Terminar
+            </button>
+          ) : (
+            <button
+              className="text-[--primary-color] border border-[--primary-color] rounded-md py-1 px-2 hover:bg-[#d144c9]/50"
+              onClick={onStartAppointment}
+            >
+              Iniciar
+            </button>
+          )}
+        </div>
       </section>
 
       <p className="font-bold">{time}</p>
 
-      {/* Mostrar acción adicional si se pasa */}
-      {action && (
-        <button
-          onClick={action}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded-md"
-        >
-          Realizar acción
-        </button>
-      )}
+      <DeleteModal
+        title={`Terminar cita con ${name}`}
+        message="¿Estás seguro que quieres finalizar la cita?"
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmEnd}
+      />
     </article>
   );
 }

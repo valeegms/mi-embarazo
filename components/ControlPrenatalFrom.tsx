@@ -37,7 +37,7 @@ export default function ControlPrenatalForm({
         label="Peso"
         type="text"
         disabled={!isEditing || isLoading || !isEditable}
-        value={formData?.weight}
+        value={formData?.weight || ""}
         onChange={handleChange}
       />
       <Input
@@ -45,7 +45,7 @@ export default function ControlPrenatalForm({
         label="Presión arterial"
         type="text"
         disabled={!isEditing || isLoading || !isEditable}
-        value={formData?.bloodPressure}
+        value={formData?.bloodPressure || ""}
         onChange={handleChange}
       />
       <Input
@@ -53,7 +53,7 @@ export default function ControlPrenatalForm({
         label="Frecuencia cardiaca fetal"
         type="text"
         disabled={!isEditing || isLoading || !isEditable}
-        value={formData?.fetalHeartRate}
+        value={formData?.fetalHeartRate || ""}
         onChange={handleChange}
       />
       <Input
@@ -61,21 +61,21 @@ export default function ControlPrenatalForm({
         label="Estado fetal"
         type="text"
         disabled={!isEditing || isLoading || !isEditable}
-        value={formData?.fetalStatus}
+        value={formData?.fetalStatus || ""}
         onChange={handleChange}
       />
       <TextField
         name="observations"
         label="Observaciones"
         disabled={!isEditing || isLoading || !isEditable}
-        value={formData?.observations}
+        value={formData?.observations || ""}
         onChange={handleChange}
       />
       <TextField
         name="prescription"
         label="Prescripción"
         disabled={!isEditing || isLoading || !isEditable}
-        value={formData?.prescription}
+        value={formData?.prescription || ""}
         onChange={handleChange}
       />
     </>

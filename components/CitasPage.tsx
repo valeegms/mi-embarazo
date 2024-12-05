@@ -7,7 +7,7 @@ import Input from "@/components/ui/Input";
 import DeleteModal from "@/components/ui/DeleteModal";
 import {
   deleteAppointment,
-  getAllAppointments
+  getAllAppointments,
 } from "@/src/services/citasService";
 import { AppointmentModel } from "@/src/models/AppointmentModel";
 import { getAllPatients } from "@/src/services/pacienteService";
@@ -26,7 +26,6 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   const [availablePatients, setAvailablePatients] = useState<PatientModel[]>(
     []
   );
-  const [shouldRefetch, setShouldRefetch] = useState(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const fetchData = async () => {
@@ -45,10 +44,9 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
     }
   };
 
-
   useEffect(() => {
     fetchData();
-  }, [shouldRefetch]);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appointments));
@@ -78,11 +76,9 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
       setAppointments((prevAppointments) =>
         prevAppointments.filter((a) => a._id !== selectedAppointment!._id)
       );
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error deleting appointment:", error);
-    }
-    finally {
+    } finally {
       setIsLoading(false);
     }
   };

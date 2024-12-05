@@ -4,12 +4,9 @@ import Image from "next/image";
 import Card from "../Card";
 import ControlPrenatalForm from "../../ControlPrenatalFrom";
 import { TabPanelProps } from "./DetailsTab";
-import { DateField, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { useEffect, useState } from "react";
 import { DateTime } from "luxon";
-import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
-import { useDebounce } from "@/hooks/useDebounce";
+import DateNavigator from "@/components/DateNavigator";
 
 export default function ControlPrenatalTab(props: TabPanelProps) {
   const {
@@ -25,7 +22,6 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
   const [date, setDate] = useState(
     formData.date ? DateTime.fromISO(formData.date) : DateTime.now()
   );
-  const [error, setError] = useState("");
   useEffect(() => {
     if (appointments) {
       const currentAppointment = appointments.find(
@@ -37,71 +33,16 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
     }
   }, [formData.date, appointments]);
 
-  const handleNextDate = () => {
-    const currentIndex = appointments!.findIndex(
+  const handleDateChange = (newDate: DateTime) => {
+    setDate(newDate);
+    const matchingAppointment = appointments?.find(
       (appointment) =>
-        DateTime.fromISO(appointment.date).toFormat("yyyy-MM-dd") ===
-        date.toISODate()
+        DateTime.fromISO(appointment.date).toISODate() === newDate.toISODate()
     );
-    if (currentIndex >= 0 && currentIndex < appointments!.length - 1) {
-      const nextDate = DateTime.fromISO(appointments![currentIndex + 1].date);
-      setDate(nextDate);
-      updateData(appointments![currentIndex + 1]);
+    if (matchingAppointment) {
+      updateData(matchingAppointment);
     }
   };
-
-  const handlePreviousDate = () => {
-    const currentIndex = appointments!.findIndex(
-      (appointment) =>
-        DateTime.fromISO(appointment.date).toFormat("yyyy-MM-dd") ===
-        date.toISODate()
-    );
-    if (currentIndex > 0) {
-      const prevDate = DateTime.fromISO(appointments![currentIndex - 1].date);
-      setDate(prevDate);
-      updateData(appointments![currentIndex - 1]);
-    }
-  };
-
-  const isFirstDate = () => {
-    return (
-      appointments!.length > 0 &&
-      DateTime.fromISO(appointments![0].date).toFormat("yyyy-MM-dd") ===
-        date.toISODate()
-    );
-  };
-
-  const isLastDate = () => {
-    return (
-      appointments!.length > 0 &&
-      DateTime.fromISO(appointments![appointments!.length - 1].date).toFormat(
-        "yyyy-MM-dd"
-      ) === date.toISODate()
-    );
-  };
-
-  const handleDateChange = (newValue: DateTime | null) => {
-    if (newValue) {
-      const matchingAppointment = appointments?.find(
-        (appointment) =>
-          DateTime.fromISO(appointment.date).toISODate() ===
-          newValue.toISODate()
-      );
-
-      if (matchingAppointment) {
-        setDate(newValue);
-        updateData(matchingAppointment);
-        setError("");
-      } else {
-        setError("No hay registros para esta fecha.");
-        setTimeout(() => {
-          setError("");
-        }, 3000);
-      }
-    }
-  };
-
-  const debouncedHandleDateChange = useDebounce(handleDateChange, 300);
 
   return (
     <div
@@ -115,39 +56,16 @@ export default function ControlPrenatalTab(props: TabPanelProps) {
         <Card>
           {formData._id ? (
             <>
-              <div className="flex items-center justify-center">
-                {appointments && (
-                  <>
-                    <button
-                      disabled={isFirstDate()}
-                      className="text-gray-500 rounded-md border-l border-t border-b border-t-gray-300 border-b-gray-300 rounded-r-none border-l-gray-300 bg-white p-[0.45rem] hover:bg-gray-100 active:bg-gray-200 disabled:bg-gray-200"
-                      onClick={handlePreviousDate}
-                    >
-                      <ChevronLeftRounded />
-                    </button>
-                    <LocalizationProvider dateAdapter={AdapterLuxon}>
-                      <DateField
-                        value={date}
-                        onChange={(newValue) => {
-                          if (newValue) debouncedHandleDateChange(newValue);
-                        }}
-                      />
-                    </LocalizationProvider>
-                    <button
-                      disabled={isLastDate()}
-                      className="text-gray-500 rounded-md border-r border-t border-b border-t-gray-300 border-b-gray-300 rounded-l-none border-r-gray-300 bg-white p-[0.45rem] hover:bg-gray-100 active:bg-gray-200 disabled:bg-gray-200"
-                      onClick={handleNextDate}
-                    >
-                      <ChevronRightRounded />
-                    </button>
-                  </>
-                )}
-              </div>
-              {error && (
-                <p className="text-red-500 text-xs font-bold text-center">
-                  {error}
-                </p>
-              )}
+              <DateNavigator
+                date={date}
+                appointments={appointments}
+                onDateChange={(newDate) => {
+                  handleDateChange(newDate);
+                }}
+                restrictedDateNavigation
+                errorMessage="No hay registros para esta fecha."
+              />
+
               <ControlPrenatalForm
                 formData={formData}
                 updateData={updateData}

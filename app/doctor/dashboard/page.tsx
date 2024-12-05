@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Card from "../../../components/ui/Card";
-import Badge from "../../../components/ui/Badge";
 import Appointment from "../../../components/ui/Appointment";
 import { OpenInNewRounded } from "@mui/icons-material";
 
 import ControlPrenatalForm from "../../../components/ControlPrenatalFrom";
-import { Skeleton, Tooltip } from "@mui/material";
+import { Alert, Skeleton, Snackbar, Tooltip } from "@mui/material";
 import {
   getAppointmentByDoctor,
   updateAppointmentDetails,
@@ -17,15 +16,14 @@ import {
   AppointmentModel,
 } from "@/src/models/AppointmentModel";
 import { DateTime } from "luxon";
-
-const currentDate = new Date().toLocaleDateString("es-ES", {
-  year: "numeric",
-  month: "long",
-  day: "numeric",
-});
+import DateNavigator from "@/components/DateNavigator";
 
 export default function DashboardPage() {
   const [appointments, setAppointments] = useState<AppointmentModel[]>([]);
+  const [filteredAppointments, setFilteredAppointments] = useState<
+    AppointmentModel[]
+  >([]);
+  const [date, setDate] = useState(DateTime.now());
   const [formData, setFormData] = useState<AppointmentDetailsModel>(
     new AppointmentDetailsModel(
       "",
@@ -50,59 +48,73 @@ export default function DashboardPage() {
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [currentPatient, setCurrentPatient] =
     useState<null | AppointmentDetailsModel>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+
+  const loadAppointments = async () => {
+    setIsLoading(true);
+    const fetchedAppointments = await getAppointmentByDoctor();
+    setAppointments(fetchedAppointments);
+
+    setDate(DateTime.now());
+
+    const todayAppointments = fetchedAppointments.filter(
+      (appointment) =>
+        DateTime.fromISO(appointment.date).toISODate() === date.toISODate()
+    );
+    setFilteredAppointments(todayAppointments);
+    console.log("Today's appointments -> ", todayAppointments);
+  };
 
   useEffect(() => {
     setCurrentPatient(null);
     localStorage.removeItem("currentPatient");
 
-    setIsLoading(true);
-    const loadAppointments = async () => {
-      const fetchedAppointments = await getAppointmentByDoctor();
-      setAppointments(fetchedAppointments);
-    };
-
     loadAppointments().finally(() => setIsLoading(false));
-  }, []);
+  }, [loadAppointments]);
 
-  appointments.sort((a, b) => (a.time > b.time ? 1 : -1));
-
-  const handleAppointmentClick = async (appointment: AppointmentModel) => {
-    if (currentPatient?.patient === appointment.patient) {
-      formData._id = appointment._id;
+  const handleEndAppointment = async () => {
+    if (currentPatient) {
       setIsSavingDetails(true);
-      formData.status = "Finalizada";
-      await updateAppointmentDetails(formData).finally(() =>
-        setIsSavingDetails(false)
-      );
-
-      setCurrentPatient(null); // Ends the current appointment
-      localStorage.removeItem("currentPatient");
-      localStorage.removeItem("currentPatientDetails");
-    } else {
-      setCurrentPatient(appointment); // Starts a new appointment
-      const parsedDate = DateTime.fromISO(appointment.date).toISODate();
-      setFormData(
-        new AppointmentDetailsModel(
-          appointment._id,
-          appointment.patient,
-          appointment.patient_name,
-          appointment.record,
-          appointment.doctor,
-          appointment.file,
-          parsedDate!,
-          appointment.time,
-          appointment.date_type,
-          appointment.status,
-          appointment.weight,
-          appointment.bloodPressure,
-          appointment.fetalHeartRate,
-          appointment.fetalStatus,
-          appointment.observations,
-          appointment.prescription
-        )
-      );
-      localStorage.setItem("currentPatient", JSON.stringify(appointment));
+      setSnackbarOpen(true);
+      setSnackbarMessage("Finalizando cita...");
+      const parsedDate = DateTime.fromISO(currentPatient.date).toISODate();
+      const formDataParsed = {
+        ...formData,
+        date: parsedDate || DateTime.now().toISODate(),
+        status: "Finalizada",
+      };
+      await updateAppointmentDetails(formDataParsed).finally(() => {
+        setCurrentPatient(null);
+        setIsSavingDetails(false);
+        localStorage.removeItem("currentPatient");
+        localStorage.removeItem("currentPatientDetails");
+        setSnackbarMessage("Cita finalizada correctamente");
+        setSnackbarOpen(true);
+      });
     }
+  };
+
+  const handleStartAppointment = (appointment: AppointmentModel) => {
+    setCurrentPatient(appointment); // Starts a new appointment
+    const parsedDate = DateTime.fromISO(appointment.date).toISODate();
+    const parsedData = {
+      ...appointment,
+      date: parsedDate || DateTime.now().toISODate(),
+    };
+    setFormData(parsedData);
+    localStorage.setItem("currentPatient", JSON.stringify(appointment));
+    localStorage.setItem("currentPatientDetails", JSON.stringify(parsedData));
+  };
+
+  const handleDateChange = (newDate: DateTime) => {
+    setDate(newDate);
+    const matchingAppointments = appointments.filter(
+      (appointment) =>
+        DateTime.fromISO(appointment.date).toISODate() === newDate.toISODate()
+    );
+    console.log("Matching appointments -> ", matchingAppointments);
+    setFilteredAppointments(matchingAppointments);
   };
 
   return (
@@ -121,19 +133,30 @@ export default function DashboardPage() {
           ) : (
             <Card
               title="Citas programadas"
-              action={<Badge type="primary">{currentDate}</Badge>}
+              action={
+                <DateNavigator
+                  isDisabled={isLoading}
+                  date={date}
+                  onDateChange={(newDate) => {
+                    if (newDate) handleDateChange(newDate);
+                  }}
+                />
+              }
               className="flex-1"
             >
               <div className="space-y-4 h-96 overflow-auto">
-                {appointments.length > 0 ? (
-                  appointments.map((appointment, index) => (
+                {filteredAppointments.length > 0 ? (
+                  filteredAppointments.map((appointment, index) => (
                     <Appointment
                       key={index}
                       name={appointment.patient_name}
                       time={appointment.time}
                       isSavingDetails={isSavingDetails}
                       status={currentPatient === appointment}
-                      onClick={() => handleAppointmentClick(appointment)}
+                      onStartAppointment={() =>
+                        handleStartAppointment(appointment)
+                      }
+                      onEndAppointment={handleEndAppointment}
                     />
                   ))
                 ) : (
@@ -155,14 +178,6 @@ export default function DashboardPage() {
               action={
                 currentPatient && (
                   <div className="space-x-2">
-                    {/* <button
-                      onClick={handleEditClick}
-                      className="
-                    bg-[--primary-color] text-white rounded-md py-1 px-4 hover:bg-[#db51d4]
-                  "
-                    >
-                      {isEditing ? "Guardar" : "Editar"}
-                    </button> */}
                     <Tooltip title="Ver expediente" placement="top-start">
                       <button
                         className="border border-[--primary-color] text-[--primary-color] rounded-md py-1 px-2 hover:bg-[#f7d0f4]"
@@ -186,6 +201,7 @@ export default function DashboardPage() {
                   <ControlPrenatalForm
                     formData={formData}
                     updateData={setFormData}
+                    isLoading={isSavingDetails}
                   />
                 </div>
               )}
@@ -193,6 +209,22 @@ export default function DashboardPage() {
           )}
         </section>
       </article>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={snackbarMessage.includes("finalizada") ? 3000 : null}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+      >
+        <Alert
+          severity={
+            snackbarMessage.toLowerCase().includes("finalizada")
+              ? "success"
+              : "info"
+          }
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </main>
   );
 }
