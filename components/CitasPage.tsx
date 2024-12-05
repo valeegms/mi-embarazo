@@ -8,6 +8,7 @@ import DeleteModal from "@/components/ui/DeleteModal";
 import {
   deleteAppointment,
   getAllAppointments,
+  getAppointmentByDoctor,
 } from "@/src/services/citasService";
 import { AppointmentModel } from "@/src/models/AppointmentModel";
 import { getAllPatients } from "@/src/services/pacienteService";
@@ -30,7 +31,7 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
     setIsLoading(true);
     try {
       const [appointmentsData, patientsData] = await Promise.all([
-        getAllAppointments(),
+        role == "admin" ? getAllAppointments() : getAppointmentByDoctor(),
         getAllPatients(),
       ]);
       setAppointments(appointmentsData);
@@ -80,8 +81,8 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   const filteredAppointments = appointments.filter((appointment) => {
     const patientName = appointment.patient_name.toLowerCase();
     const appointmentDate = appointment.date.toLowerCase();
-    const status = appointment.status.toLowerCase();
-    const record = appointment.record.toLowerCase();
+    const status = appointment.status?.toLowerCase();
+    const record = appointment.record?.toLowerCase();
     const searchTerm = searchQuery.toLowerCase();
 
     // Check if search term matches any of the relevant fields

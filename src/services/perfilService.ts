@@ -38,9 +38,9 @@ export const verifyPassword = async (email: string, password: string) => {
   }
 };
 
-export const updateProfile = async (userData: UserData) => {
+export const updateProfile = async (id: string, userData: UserData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/users/${userData._id}`, {
+    const response = await fetch(`${API_BASE_URL}/users/${id}`, {
       method: "PUT",
       headers: getHeaders(),
       body: JSON.stringify({

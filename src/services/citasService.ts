@@ -21,8 +21,9 @@ export async function getAllAppointments(): Promise<AppointmentModel[]> {
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
     const appointments: AppointmentModel[] = await response.json();
     
-    console.log("Lista de citas:", appointments);
-    return appointments.filter((appointment) => appointment.record !== null);;
+    // console.log("Lista de citas:", appointments);
+    // return appointments.filter((appointment) => appointment.record !== null);;
+    return appointments;
   } catch (error) {
     console.error("Error al obtener citas:", error);
     throw error; // Relanza el error para manejo adicional
@@ -66,9 +67,9 @@ export async function getAppointmentByDoctor(status?: string): Promise<Appointme
 
     // Convierte la respuesta a JSON y la retorna como un arreglo de citas
     const appointments: AppointmentModel[] = await response.json();
-    if(status) {
-      return appointments.filter((appointment) => appointment.status === status);
-    }
+    // if(status) {
+    //   return appointments.filter((appointment) => appointment.status === status);
+    // }
     console.log("Lista de citas:", appointments);
     return appointments;
   } catch (error) {
