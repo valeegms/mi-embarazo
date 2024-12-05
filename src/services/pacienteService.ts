@@ -1,5 +1,21 @@
-import { PatientModel } from "../models/PatientModel";
 import { API_BASE_URL, getHeaders, handleResponse } from "./apiConfig";
+import { PatientModel } from "@/src/models/PatientModel";
+
+export async function getPacientes(): Promise<PatientModel[]> {
+  console.log(API_BASE_URL);
+  try {
+    const res = await fetch(`${API_BASE_URL}/patients`);
+    if (!res.ok) {
+      throw new Error("Error al obtener la lista de pacientes");
+    }
+    return await res.json();
+  } catch (error) {
+    console.error("Error en getPacientes:", error);
+    throw error;
+  }
+}
+
+
 
 export async function getPatientById(id: string) {
     try {

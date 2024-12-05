@@ -6,144 +6,83 @@ import CitasModal from "@/components/ui/CitasModal";
 import Input from "@/components/ui/Input";
 import DeleteModal from "@/components/ui/DeleteModal";
 import { format, parse } from "date-fns";
-import { Appointment } from "@/src/services/doctorCitasService";
-import {
-  getAllAppointments,
-  getAppointmentByDoctor,
-} from "@/src/services/citasService";
+
+export interface Appointment {
+  record: string;
+  patient: string;
+  patient_name: string;
+  doctor: string;
+  file: string | null;
+  date: string;
+  time: string;
+  date_type: string;
+  status: string;
+  weight: number;
+  bloodPressure: string;
+  fetalHeartRate: string;
+  fetalStatus: string;
+  observations: string;
+  prescription: string;
+}
 
 const LOCAL_STORAGE_KEY = "appointments";
 
-// Function to get the patient's name by their ID
-async function getPatientNameById(patientId: string): Promise<string> {
-  try {
-    const res = await fetch(`http://localhost:8000/patients/${patientId}`);
-    if (!res.ok) throw new Error("Error al obtener el paciente");
-    const patient = await res.json();
-    return patient.personalData?.name || "Nombre no disponible";
-  } catch (error) {
-    console.error("Error al obtener el nombre del paciente:", error);
-    return "Error al obtener el nombre";
+// Lista de citas proporcionada (solo para demostración inicial)
+const APPOINTMENTS_LIST = [
+  {
+    record: "6748971a777c453dbdce3341_2024-11-28T00:00:00_3:35",
+    patient: "6748971a777c453dbdce3341",
+    patient_name: "John Doe",
+    doctor: "67462520590b948ba552ab57",
+    file: null,
+    date: "2024-11-28T00:00:00",
+    time: "3:35",
+    date_type: "Nueva Cita",
+    status: "Confirmada",
+    weight: 0.0,
+    bloodPressure: "",
+    fetalHeartRate: "",
+    fetalStatus: "",
+    observations: "",
+    prescription: "",
   }
-}
+];
 
 export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   const [isCitasModalOpen, setIsCitasModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<
-    Appointment | undefined
-  >(undefined);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | undefined>(undefined);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
-  const updateAppointment = async (appointment: Appointment) => {
-    const appointmentId = appointment.record;
-    const accessToken = localStorage.getItem("accessToken");
-
-    try {
-      const response = await fetch(
-        `http://localhost:8000/appointments/${appointmentId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify(appointment),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Error al actualizar la cita");
-      }
-
-      const updatedAppointment = await response.json();
-      console.log("Cita actualizada con éxito", updatedAppointment);
-    } catch (error) {
-      console.error("Error al realizar la solicitud PUT:", error);
-    }
-  };
-
-  // Fetch appointments and transform them
+  // Cargar las citas desde localStorage o usar las citas por defecto
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        let fetchedAppointments;
-        if (role === "doctor") {
-          fetchedAppointments = await getAppointmentByDoctor();
-        } else {
-          fetchedAppointments = await getAllAppointments();
-        }
-
-        // Transform appointments
-        const transformedAppointments = await Promise.all(
-          fetchedAppointments.map(async (appointment) => {
-            const formattedDate = new Date(appointment.date);
-            const formattedDateString = formattedDate.toLocaleDateString(
-              "es-ES",
-              {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }
-            );
-
-            const normalizeTime = (time: string): string => {
-              const hasAmPm = /[APap][Mm]$/.test(time);
-              if (hasAmPm) {
-                const parsedTime = parse(time, "hh:mm a", new Date());
-                return format(parsedTime, "HH:mm");
-              }
-              return time;
-            };
-
-            const translateType = (type: string): string => {
-              switch (type) {
-                case "Consultation":
-                  return "Nuevo paciente";
-                case "virtual":
-                  return "Virtual";
-                case "presencial":
-                  return "Presencial";
-                default:
-                  return type;
-              }
-            };
-
-            const translateStatus = (status: string): string => {
-              switch (status) {
-                case "pending":
-                  return "Pendiente";
-                case "Scheduled":
-                  return "Confirmada";
-                default:
-                  return status;
-              }
-            };
-
-            return {
-              ...appointment,
-              name: "Lenin Gael",
-              date: formattedDateString,
-              time: normalizeTime(appointment.time),
-              type: translateType(appointment.date_type),
-              status: translateStatus(appointment.status),
-            };
-          })
-        );
-
-        setAppointments(transformedAppointments);
-      } catch (error) {
-        console.error("Error al obtener las citas:", error);
-      }
-    };
-
-    fetchAppointments();
+    const storedAppointments = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (storedAppointments) {
+      // Si hay citas en localStorage, las cargamos y las transformamos
+      const parsedAppointments: Appointment[] = JSON.parse(storedAppointments);
+      setAppointments(parsedAppointments);
+    } else {
+      // Si no hay citas en localStorage, usar las citas por defecto
+      setAppointments(APPOINTMENTS_LIST);
+    }
   }, []);
 
-  useEffect(() => {
-    // Save appointments to localStorage whenever they change
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(appointments));
-  }, [appointments]);
+  // Función para limpiar citas antes de almacenarlas
+  const cleanAppointment = (appointment: Appointment) => {
+    return {
+      ...appointment,
+      file: appointment.file ? null : undefined, // Limpiar 'file' si no es necesario
+    };
+  };
+
+  // Función para guardar citas en localStorage
+  const saveAppointmentsToLocalStorage = (appointments: Appointment[]) => {
+    // Limpiar cada cita antes de almacenarla
+    const cleanedAppointments = appointments.map(cleanAppointment);
+
+    // Guardar en localStorage
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(cleanedAppointments));
+  };
 
   const handleNewAppointment = () => {
     setSelectedAppointment(undefined);
@@ -156,27 +95,34 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
   };
 
   const handleDeleteAppointment = (appointment: Appointment) => {
-    setAppointments((prev) =>
-      prev.filter((appt) => appt.record !== appointment.record)
-    );
+    const updatedAppointments = appointments.filter((appt) => appt.record !== appointment.record);
+    setAppointments(updatedAppointments);
+    saveAppointmentsToLocalStorage(updatedAppointments);
     setIsDeleteModalOpen(true);
   };
 
   const handleSaveAppointment = (editedAppointment: Appointment) => {
+    
     setAppointments((prev) => {
       const index = prev.findIndex(
         (appt) => appt.record === editedAppointment.record
       );
+      let updatedAppointments;
       if (index !== -1) {
-        const updated = [...prev];
-        updated[index] = editedAppointment;
-
-        updateAppointment(editedAppointment);
-
-        return updated;
+        // Si la cita ya existe, la actualizamos
+        updatedAppointments = [...prev];
+        updatedAppointments[index] = editedAppointment;
+      } else {
+        // Si es una nueva cita, la agregamos
+        updatedAppointments = [...prev, editedAppointment];
       }
-      return [...prev, editedAppointment]; // Add new appointment
+
+      // Guardar las citas en localStorage después de la actualización
+      saveAppointmentsToLocalStorage(updatedAppointments);
+
+      return updatedAppointments;
     });
+    
     setIsCitasModalOpen(false);
   };
 
@@ -186,7 +132,7 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
         <h1 className="text-3xl font-bold">Citas</h1>
         <button
           className="bg-[--primary-color] text-white rounded-md p-2 px-8"
-          onClick={handleNewAppointment}
+          onClick={handleNewAppointment} // Este botón abre el modal para crear una nueva cita
         >
           Nueva cita
         </button>
@@ -197,7 +143,7 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
         appointments={appointments}
         onEdit={handleEditAppointment}
         onDelete={handleDeleteAppointment}
-        role={role} // Asegúrate de pasar role aquí
+        role={role}
       />
 
       <DeleteModal
@@ -211,7 +157,7 @@ export default function CitasPage({ role }: { role: "doctor" | "admin" }) {
         isOpen={isCitasModalOpen}
         onClose={() => setIsCitasModalOpen(false)}
         appointment={selectedAppointment}
-        onSave={handleSaveAppointment}
+        onSave={handleSaveAppointment} // Este es el botón que guarda la cita
       />
     </main>
   );

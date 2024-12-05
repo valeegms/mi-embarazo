@@ -41,7 +41,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData?.name}
+                value="John Doe"
               />
               <Input
                 name="maritalStatus"
@@ -73,7 +73,7 @@ export default function DetailsTab(props: TabPanelProps) {
                 type="text"
                 disabled={!isEditing}
                 onChange={handleChange}
-                value={formData?.personalData?.phone}
+                value="9992067170"
               />
               <Input
                 name="street"

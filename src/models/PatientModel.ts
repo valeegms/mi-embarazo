@@ -1,44 +1,18 @@
-export class PatientModel {
+export interface PatientModel {
     id: string;
     record: string;
     name: string;
     personalData: PersonalData;
-    current_phone: string;
-    doctor_options: [];
-    schedule_options: [];
+    currentPhone: string;
+    doctorOptions: string[]; // Ajuste a tipo específico
+    scheduleOptions: string[]; // Ajuste a tipo específico
     doctor: string;
     date: string;
     pregnancyData: PregnancyData;
     medicalHistory: MedicalHistory;
-
-    constructor(
-        id: string = '',
-        record: string = '',
-        name: string = '',
-        personalData: PersonalData = new PersonalData('','','',0,'','','','','',{},'','','','',''),
-        current_phone: string = '',
-        doctor_options: [] = [],
-        schedule_options: [] = [],
-        doctor: string = '',
-        date: string = '',
-        pregnancyData: PregnancyData = new PregnancyData('','','',0,0,'','',''),
-        medicalHistory: MedicalHistory = new MedicalHistory('','','','')
-    ) {
-        this.id = id;
-        this.record = record;
-        this.name = name;
-        this.personalData = personalData;
-        this.current_phone = current_phone;
-        this.doctor_options = doctor_options;
-        this.schedule_options = schedule_options;
-        this.doctor = doctor;
-        this.date = date;
-        this.pregnancyData = pregnancyData;
-        this.medicalHistory = medicalHistory;
-    }
-}
-
-export class PersonalData {
+  }
+  
+  export interface PersonalData {
     name: string;
     gender: string;
     phone: string;
@@ -49,93 +23,36 @@ export class PersonalData {
     curp: string;
     maritalStatus: string;
     occupation: string;
-    address: object;
+    address: Address;
     street: string;
     municipality: string;
     locality: string;
     state: string;
-
-    constructor(
-        name: string,
-        gender: string,
-        phone: string,
-        age: number,
-        birthDate: string,
-        email: string,
-        password: string,
-        curp: string,
-        occupation: string,
-        address: object,
-        maritalStatus: string,
-        street: string,
-        municipality: string,
-        locality: string,
-        state: string
-    ) {
-        this.name= name;
-        this.gender= gender;
-        this.phone= phone;
-        this.age= age;
-        this.birthDate= birthDate;
-        this.email= email;
-        this.password= password;
-        this.curp= curp;
-        this.occupation= occupation;
-        this.address= address;
-        this.maritalStatus= maritalStatus;
-        this.street= street;
-        this.municipality= municipality;
-        this.locality= locality;
-        this.state= state;
-    }
-}
-
-export class PregnancyData {
+  }
+  
+  export interface Address {
+    street: string;
+    municipality: string;
+    locality: string;
+    state: string;
+    [key: string]: unknown; // Flexibilidad para más campos si es necesario
+  }
+  
+  export interface PregnancyData {
     lastMenstruation: string;
-    dueDate : string;
-    gestationStage : string;
-    previousPregnancies : number;
-    abortions : number;
-    pregnancyType : string;
-    complication : string;
-    observations : string;
-
-    constructor(
-        lastMenstruation: string,
-        dueDate : string,
-        gestationStage : string,
-        previousPregnancies : number,
-        abortions : number,
-        pregnancyType : string,
-        complication : string,
-        observations : string
-    ) {
-        this.lastMenstruation=lastMenstruation;
-        this.dueDate =dueDate ;
-        this.gestationStage =gestationStage ;
-        this.previousPregnancies =previousPregnancies ;
-        this.abortions =abortions ;
-        this.pregnancyType =pregnancyType ;
-        this.complication =complication ;
-        this.observations =observations ;
-    }
-}
-
-export class MedicalHistory{
+    dueDate: string;
+    gestationStage: string;
+    previousPregnancies: number;
+    abortions: number;
+    pregnancyType: string;
+    complication: string;
+    observations: string;
+  }
+  
+  export interface MedicalHistory {
     medicalConditions: string;
     gynecologicalHistory: string;
-    allergies : string;
-    familyHistory : string;
-
-    constructor(
-        medicalConditions: string,
-        gynecologicalHistory: string,
-        allergies : string,
-        familyHistory : string
-    ) {
-        this.medicalConditions=medicalConditions;
-        this.gynecologicalHistory=gynecologicalHistory;
-        this.allergies =allergies ;
-        this.familyHistory =familyHistory ;
-    }
-}
+    allergies: string;
+    familyHistory: string;
+  }
+  

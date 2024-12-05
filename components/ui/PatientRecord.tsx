@@ -9,25 +9,24 @@ import { savePatientDetails } from "@/src/services/pacienteService";
 
 export default function PatientRecord({ patient }: { patient: PatientModel }) {
   const [tab, setTab] = useState(0);
-  const [formData, setFormData] = useState<PatientModel>(new PatientModel());
+  const [formData, setFormData] = useState<PatientModel | null>(null); // Start with null state
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  
 
   useEffect(() => {
     if (patient) {
       setFormData(patient);
-      console.log("Patient data:", formData);
-      setIsLoading(false);
+      setIsLoading(false); // Stop loading once patient data is set
     } else {
       setIsLoading(true);
     }
-  }, [patient]);
+  }, [patient]); // Depend on `patient` to update formData when it changes
 
   const commonProps = {
     isEditing,
     formData,
-    updateData: (patient: PatientModel) =>
-      setFormData({ ...formData, ...patient }),
+    updateData: (updatedPatient: PatientModel) => setFormData({ ...formData!, ...updatedPatient }), // Ensure formData is not null before updating
   };
 
   const tabs = [
@@ -45,8 +44,9 @@ export default function PatientRecord({ patient }: { patient: PatientModel }) {
     if (isEditing) {
       try {
         setIsLoading(true);
-
-        await savePatientDetails(formData!.id, formData!);
+        if (formData?.id) {
+          await savePatientDetails(formData.id, formData);
+        }
       } catch (error) {
         console.error("Error saving patient details:", error);
       } finally {

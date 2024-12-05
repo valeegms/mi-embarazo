@@ -27,12 +27,11 @@ export default function PatientCard({
   return (
     <article className="bg-white shadow-md rounded-lg p-6">
       <section className="flex items-center space-x-4">
-        <Avatar name={patient.personalData.name} />
+        <Avatar name="{patient.personalData.name}" />
         <div>
           <h3 className="font-bold">{patient.personalData.name}</h3>
           <p className="text-sm text-gray-400">
             {patient.personalData.age} años |{" "}
-            {patient.pregnancyData.gestationStage} meses de embarazo
           </p>
         </div>
       </section>

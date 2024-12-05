@@ -1,149 +1,131 @@
-import { Modal } from "@mui/material";
-import Input from "./Input";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import { Appointment } from "@/pages/citas"; // Importa la interfaz Appointment
 
-export default function CitasModal({
-  isOpen,
-  onClose,
-  appointment,
-}: {
+interface CitasModalProps {
   isOpen: boolean;
   onClose: () => void;
-  appointment?: {
-    name: string;
-    record: string;
-    date: string;
-    time: string;
-    type: string;
-    status: string;
-  };
-}) {
-  const [formData, setFormData] = useState({
-    name: "",
+  appointment?: Appointment;
+  onSave: (appointment: Appointment) => void; // El tipo de onSave es Appointment
+}
+
+const CitasModal = ({ isOpen, onClose, appointment, onSave }: CitasModalProps) => {
+  const [formData, setFormData] = useState<Appointment>({
     record: "",
+    patient: "",
+    patient_name: "",
+    doctor: "",
+    file: null,
     date: "",
     time: "",
-    type: "Nuevo paciente",
-    status: "Confirmada",
+    date_type: "",
+    status: "",
+    weight: 0,
+    bloodPressure: "",
+    fetalHeartRate: "",
+    fetalStatus: "",
+    observations: "",
+    prescription: "",
   });
 
   useEffect(() => {
     if (appointment) {
       setFormData(appointment);
-    } else {
-      // Reset form for new appointments
-      setFormData({
-        name: "",
-        record: "",
-        date: "",
-        time: "",
-        type: "Nuevo paciente",
-        status: "Confirmada",
-      });
     }
   }, [appointment]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitted Data: ", formData);
-    onClose();
+    // Llamar a la función onSave al guardar la cita
+    onSave(formData);
   };
 
   return (
-    <Modal open={isOpen} onClose={onClose}>
-      <div className="bg-white p-8 w-[30rem] mx-auto mt-20 rounded-md">
-        <h2 className="text-2xl font-bold">
-          {appointment ? "Editar cita" : "Nueva cita"}
-        </h2>
-        <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-          <label
-            className="text-[#8b8b8b] text-sm font-bold"
-            htmlFor="paciente"
-          >
-            Nombre
-          </label>
-          <select
-            id="paciente"
-            name="paciente"
-            className="p-2 border border-gray-200 rounded-md w-full"
-            onChange={handleChange}
-            value={appointment?.name}
-            disabled={appointment !== undefined}
-          >
-            {appointment ? (
-              <option value={appointment.name}>{appointment.name}</option>
-            ) : (
-              <option value="">Seleccionar paciente</option>
-            )}
-            <option value="María González">María González</option>
-            <option value="José Pérez">José Pérez</option>
-            <option value="Ana García">Ana García</option>
-            <option value="Carlos López">Carlos López</option>
-          </select>
-          <Input
-            label="Expediente"
-            name="record"
-            type="text"
-            value={formData.record}
-            onChange={handleChange}
-            disabled
-          />
-          <div className="flex space-x-2">
-            <Input
-              className="flex-1"
-              label="Fecha de cita"
-              name="date"
-              type="date"
-              value={formData.date}
+    <div
+      className={`fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center transition-opacity ${
+        isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+      }`}
+    >
+      <div className="bg-white p-4 rounded-md shadow-lg w-1/3">
+        <h2 className="text-xl font-bold mb-4">{appointment ? "Editar Cita" : "Nueva Cita"}</h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label htmlFor="patient_name" className="text-sm font-bold text-gray-700">Nombre del paciente</label>
+            <input
+              type="text"
+              id="patient_name"
+              name="patient_name"
+              value={formData.patient_name}
               onChange={handleChange}
-            />
-            <Input
-              className="flex-1"
-              label="Hora de cita"
-              name="time"
-              type="time"
-              value={formData.time}
-              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div className="flex space-x-2">
-            <div className="space-y-1 flex-1">
-              <label
-                className="text-[#8b8b8b] text-sm font-bold"
-                htmlFor="type"
-              >
-                Tipo de cita
-              </label>
+
+          <div className="space-y-2">
+            <label htmlFor="record" className="text-sm font-bold text-gray-700">Expediente</label>
+            <input
+              type="text"
+              id="record"
+              name="record"
+              value={formData.record}
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          <div className="flex space-x-4">
+            <div className="w-1/2 space-y-2">
+              <label htmlFor="date" className="text-sm font-bold text-gray-700">Fecha de cita</label>
+              <input
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="w-1/2 space-y-2">
+              <label htmlFor="time" className="text-sm font-bold text-gray-700">Hora de cita</label>
+              <input
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                type="time"
+                name="time"
+                value={formData.time}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="flex space-x-4">
+            <div className="w-1/2 space-y-2">
+              <label htmlFor="date_type" className="text-sm font-bold text-gray-700">Tipo de cita</label>
               <select
-                id="type"
-                name="type"
-                className="p-2 border border-gray-200 rounded-md w-full"
-                value={formData.type}
+                id="date_type"
+                name="date_type"
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={formData.date_type}
                 onChange={handleChange}
               >
-                <option value="Consultation">Nuevo paciente</option>
-                <option value="virtual">Virtual</option>
-                <option value="presencial">Presencial</option>
+                <option value="Nuevo paciente">Nuevo paciente</option>
+                <option value="Virtual">Virtual</option>
+                <option value="Presencial">Presencial</option>
               </select>
             </div>
-            <div className="space-y-1 flex-1">
-              <label
-                className="text-[#8b8b8b] text-sm font-bold"
-                htmlFor="status"
-              >
-                Estado
-              </label>
+
+            <div className="w-1/2 space-y-2">
+              <label htmlFor="status" className="text-sm font-bold text-gray-700">Estado</label>
               <select
                 id="status"
                 name="status"
-                className="p-2 border border-gray-200 rounded-md w-full"
+                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 value={formData.status}
                 onChange={handleChange}
               >
@@ -152,22 +134,28 @@ export default function CitasModal({
               </select>
             </div>
           </div>
-          <section className="flex space-x-2">
+
+          <div className="mt-6 flex justify-between">
             <button
-              type="submit"
-              className="bg-[--primary-color] text-white rounded-md p-2 w-full"
-            >
-              Guardar
-            </button>
-            <button
+              type="button"
               onClick={onClose}
-              className="bg-red-100 text-red-700 rounded-md p-2 w-full hover:bg-red-200"
+              className="bg-gray-500 text-white px-6 py-3 rounded-md hover:bg-gray-600"
             >
               Cancelar
             </button>
-          </section>
+            <button
+              type="submit"
+              className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600"
+            >
+              Guardar
+            </button>
+          </div>
         </form>
+
       </div>
-    </Modal>
+    </div>
   );
-}
+};
+
+export default CitasModal;
+

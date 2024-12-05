@@ -10,19 +10,18 @@ import {
 import Badge from "./Badge";
 import { DeleteRounded, Edit } from "@mui/icons-material";
 
-import { Appointment as BaseAppointment} from "@/src/services/doctorCitasService";
+import { Appointment } from "../CitasPage";
 
-type Appointment = BaseAppointment & {
-  additionalProperty?: string; // Agrega las propiedades necesarias
-};
+
 
 type AppointmentsTableProps = {
   appointments: Appointment[];
   onEdit: (appointment: Appointment) => void;
   onDelete: (appointment: Appointment) => void;
-  role: "doctor" | "admin"; // Agrega esta línea
+  role: "doctor" | "admin"; // Role type for conditional rendering
 };
 
+// Get Badge color based on the type of appointment
 const getTypeChipColor = (
   type: string
 ): { color: "warning" | "secondary" | "primary" } => {
@@ -31,11 +30,14 @@ const getTypeChipColor = (
       return { color: "warning" };
     case "Virtual":
       return { color: "secondary" };
+    case "Presencial":
+      return { color: "primary" };
     default:
       return { color: "primary" };
   }
 };
 
+// Get Badge color based on the status of the appointment
 const getStatusChipColor = (
   status: string
 ): { color: "success" | "danger" | "primary" } => {
@@ -53,7 +55,7 @@ export default function AppointmentsTable({
   appointments,
   onEdit,
   onDelete,
-  role, // Added "role" prop to function arguments
+  role, // Role passed as prop for conditional rendering
 }: AppointmentsTableProps) {
   return (
     <TableContainer component={Paper} className="pt-6">
@@ -84,10 +86,10 @@ export default function AppointmentsTable({
         <TableBody>
           {appointments.map((appointment, index) => (
             <TableRow key={index}>
-              <TableCell>{appointment.name}</TableCell>
+              <TableCell>{appointment.patient_name}</TableCell>
               <TableCell>{appointment.record}</TableCell>
               <TableCell>{appointment.date}</TableCell>
-              <TableCell>{appointment.time + " A.M."}</TableCell>
+              <TableCell>{appointment.time}</TableCell>
               <TableCell>
                 <Badge type={getTypeChipColor(appointment.date_type).color}>
                   {appointment.date_type}
@@ -106,7 +108,7 @@ export default function AppointmentsTable({
                   >
                     <Edit />
                   </button>
-                  {role === "admin" && ( // Conditional rendering for "Delete" button
+                  {role === "admin" && (
                     <button
                       className="bg-red-100 px-2 py-1 rounded text-red-800 hover:bg-red-600 hover:bg-opacity-25"
                       onClick={() => onDelete(appointment)}
@@ -123,3 +125,4 @@ export default function AppointmentsTable({
     </TableContainer>
   );
 }
+
