@@ -37,11 +37,13 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await login(email, password).finally(() => setIsLoading(false)); // Use login method from AuthContext
+      await login(email, password).finally(); // Use login method from AuthContext
     } catch (error: unknown) {
       if (error instanceof Error) {
         setError(error.message || "Ocurrió un error al iniciar sesión.");
+        setIsLoading(false);
       } else {
+        setIsLoading(false);
         setError("Ocurrió un error inesperado.");
       }
     }
